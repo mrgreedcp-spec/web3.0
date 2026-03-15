@@ -1527,6 +1527,706 @@ print(f'   训练类别: {clf.classes_}')
 
 ---
 
+## 🍼 最具商业价值的婴儿 AI 项目 — 产品需求文档（PRD）
+
+> **以下内容以资深产品经理视角撰写，可直接复制粘贴到 Claude Code / Cursor / ChatGPT Codex 中生成完整项目代码。**
+
+---
+
+### 📋 项目概述
+
+| 字段 | 内容 |
+|------|------|
+| **项目名称** | BabyCare AI — 智能婴儿哭声情绪识别与运动发育评估 App |
+| **一句话描述** | 一款基于手机的 AI 婴儿监护应用，通过麦克风实时识别婴儿哭声情绪（饥饿/疼痛/疲倦/不适/胀气），同时通过摄像头评估婴儿运动发育是否正常 |
+| **目标用户** | 0–18 个月婴儿的父母、月嫂、儿科医生、早教机构 |
+| **商业模式** | Freemium（免费哭声识别 + 付费高级运动评估报告 $4.99/月） |
+| **市场规模** | 全球婴儿监护市场 2025 年约 $18B，AI 婴儿健康细分预计 $2.5B（CAGR 12%） |
+| **竞品分析** | ChatterBaby（仅哭声，无视频）、Nanit（$299 硬件+订阅）、Cry Translator（准确率低）→ 我们：**纯手机方案 + 哭声+视频双模态 + 低价订阅** |
+| **核心优势** | ① 不需要额外硬件 ② 双模态（音频+视频）③ 支持离线运行 ④ 多语言 ⑤ 成本远低于竞品 |
+
+---
+
+### 🏗️ 技术架构
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    BabyCare AI App                   │
+│                  (Flutter / React Native)            │
+├─────────────┬───────────────────┬───────────────────┤
+│  🎤 哭声模块  │  📹 视频运动模块   │  📊 数据分析模块  │
+│             │                   │                   │
+│ PyAudio/    │ MediaPipe Pose    │ 历史记录          │
+│ AudioRecord │ MoveNet           │ 趋势图表          │
+│     ↓       │      ↓            │ 发育报告          │
+│ Librosa     │ 33个骨骼关键点     │ PDF导出           │
+│ MFCC提取    │ 运动特征计算       │                   │
+│     ↓       │      ↓            │                   │
+│ CNN/LSTM    │ RandomForest      │                   │
+│ TFLite模型  │ TFLite模型        │                   │
+│     ↓       │      ↓            │                   │
+│ 5类情绪输出  │ 正常/异常评估      │                   │
+├─────────────┴───────────────────┴───────────────────┤
+│              🔔 实时通知 + 📱 推送告警               │
+├─────────────────────────────────────────────────────┤
+│           ☁️ Firebase (用户/数据/推送)               │
+│           📈 后台管理 (FastAPI + PostgreSQL)         │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+### 📁 项目目录结构
+
+> **复制以下内容给 Claude Code，让它按此结构生成完整项目：**
+
+```
+babycare-ai/
+├── README.md                          # 项目说明文档
+├── requirements.txt                   # Python 依赖
+├── setup.py                          # 安装配置
+├── .env.example                      # 环境变量模板
+│
+├── backend/                          # 后端服务 (FastAPI)
+│   ├── main.py                       # FastAPI 入口
+│   ├── config.py                     # 配置管理
+│   ├── models/                       # 数据模型
+│   │   ├── user.py                   # 用户模型
+│   │   ├── baby.py                   # 婴儿档案模型
+│   │   └── record.py                 # 检测记录模型
+│   ├── api/                          # API 路由
+│   │   ├── auth.py                   # 认证接口
+│   │   ├── cry_analysis.py           # 哭声分析接口
+│   │   ├── motor_assessment.py       # 运动评估接口
+│   │   └── reports.py                # 报告生成接口
+│   ├── services/                     # 业务逻辑
+│   │   ├── cry_classifier.py         # 哭声分类服务
+│   │   ├── motor_analyzer.py         # 运动分析服务
+│   │   ├── report_generator.py       # 报告生成服务
+│   │   └── notification.py           # 通知推送服务
+│   └── database/                     # 数据库
+│       ├── connection.py             # 数据库连接
+│       └── migrations/               # 数据库迁移
+│
+├── ai_models/                        # AI 模型
+│   ├── cry_emotion/                  # 哭声情绪模型
+│   │   ├── train.py                  # 训练脚本
+│   │   ├── predict.py                # 推理脚本
+│   │   ├── feature_extraction.py     # MFCC 特征提取
+│   │   ├── model.py                  # CNN+LSTM 模型定义
+│   │   ├── dataset.py                # 数据集加载器
+│   │   └── export_tflite.py          # TFLite 导出
+│   ├── motor_assessment/             # 运动评估模型
+│   │   ├── train.py                  # 训练脚本
+│   │   ├── predict.py                # 推理脚本
+│   │   ├── pose_extraction.py        # MediaPipe 姿态提取
+│   │   ├── feature_engineering.py    # 运动特征工程
+│   │   ├── model.py                  # 分类模型定义
+│   │   └── export_tflite.py          # TFLite 导出
+│   └── pretrained/                   # 预训练模型存放
+│       ├── cry_classifier.tflite
+│       └── motor_assessor.tflite
+│
+├── mobile/                           # 移动端 (Flutter)
+│   ├── lib/
+│   │   ├── main.dart                 # App 入口
+│   │   ├── screens/                  # 页面
+│   │   │   ├── home_screen.dart      # 首页（实时监测）
+│   │   │   ├── cry_monitor.dart      # 哭声监测页
+│   │   │   ├── motor_assess.dart     # 运动评估页
+│   │   │   ├── history.dart          # 历史记录页
+│   │   │   ├── report.dart           # 发育报告页
+│   │   │   └── settings.dart         # 设置页
+│   │   ├── services/                 # 服务层
+│   │   │   ├── audio_service.dart    # 音频采集
+│   │   │   ├── camera_service.dart   # 摄像头管理
+│   │   │   ├── tflite_service.dart   # TFLite 推理
+│   │   │   └── api_service.dart      # 后端 API 调用
+│   │   ├── models/                   # 数据模型
+│   │   ├── widgets/                  # 自定义组件
+│   │   └── utils/                    # 工具函数
+│   ├── pubspec.yaml                  # Flutter 依赖
+│   └── assets/                       # 资源文件
+│       ├── models/                   # TFLite 模型
+│       └── sounds/                   # 音效资源
+│
+├── data/                             # 数据集与处理
+│   ├── raw/                          # 原始数据
+│   ├── processed/                    # 处理后数据
+│   ├── download_datasets.sh          # 数据集下载脚本
+│   └── data_augmentation.py          # 数据增强
+│
+├── tests/                            # 测试
+│   ├── test_cry_classifier.py        # 哭声分类测试
+│   ├── test_motor_analyzer.py        # 运动分析测试
+│   ├── test_api.py                   # API 测试
+│   └── test_integration.py           # 集成测试
+│
+├── docs/                             # 文档
+│   ├── API.md                        # API 文档
+│   ├── DEPLOYMENT.md                 # 部署指南
+│   └── MODEL_TRAINING.md             # 模型训练指南
+│
+├── scripts/                          # 工具脚本
+│   ├── setup_env.sh                  # 环境搭建
+│   ├── train_all_models.sh           # 一键训练
+│   └── deploy.sh                     # 一键部署
+│
+├── docker-compose.yml                # Docker 编排
+├── Dockerfile.backend                # 后端 Docker
+└── .github/
+    └── workflows/
+        └── ci.yml                    # CI/CD 流水线
+```
+
+---
+
+### 🎯 功能需求（User Stories）
+
+#### P0 — 核心功能（MVP 必须）
+
+| 编号 | 用户故事 | 验收标准 |
+|------|---------|---------|
+| US-01 | 作为父母，我想实时监测婴儿哭声并知道哭的原因 | 麦克风采集 → 3 秒内返回情绪分类（饥饿/疼痛/疲倦/不适/胀气），准确率 ≥85% |
+| US-02 | 作为父母，我想收到哭声告警推送 | 检测到哭声后 5 秒内推送通知到手机，显示情绪类型和置信度 |
+| US-03 | 作为父母，我想通过手机摄像头评估宝宝运动发育 | 录制 30 秒视频 → 提取骨骼关键点 → 输出发育评估结果（正常/需关注/建议就医） |
+| US-04 | 作为父母，我想查看历史记录和趋势 | 按日/周/月展示哭声次数、情绪分布图表、运动发育评分趋势 |
+| US-05 | 作为用户，我想注册/登录管理我的宝宝信息 | 支持手机号/邮箱/微信登录，可添加多个宝宝档案（姓名、出生日期、性别） |
+
+#### P1 — 重要功能（v1.1）
+
+| 编号 | 用户故事 | 验收标准 |
+|------|---------|---------|
+| US-06 | 作为父母，我想生成发育评估 PDF 报告 | 一键生成包含哭声统计 + 运动评估 + 发育建议的 PDF，可分享给医生 |
+| US-07 | 作为父母，我想离线使用核心功能 | TFLite 模型在本地运行，无网络时也可进行哭声识别和运动评估 |
+| US-08 | 作为父母，我想设置自定义告警规则 | 可设置：连续哭声 >5 分钟告警、夜间静音模式、特定情绪重点告警 |
+
+#### P2 — 增值功能（v2.0）
+
+| 编号 | 用户故事 | 验收标准 |
+|------|---------|---------|
+| US-09 | 作为父母，我想获得个性化育儿建议 | 基于 LLM 结合宝宝历史数据，提供个性化安抚建议和发育指导 |
+| US-10 | 作为儿科医生，我想查看患者的发育数据 | 医生端 Web 面板，查看患者家长共享的发育数据和趋势报告 |
+| US-11 | 作为父母，我想与其他父母交流 | 社区功能，分享育儿经验、发育里程碑，匿名咨询 |
+
+---
+
+### 🔧 可直接给 Claude Code 的完整 Prompt
+
+> **复制下面整段文字，粘贴到 Claude Code 中即可生成完整项目：**
+
+```markdown
+请帮我创建一个名为 "BabyCare AI" 的完整项目，这是一个智能婴儿哭声情绪识别与运动发育评估系统。
+
+## 项目技术栈
+
+### 后端 (Python)
+- FastAPI 作为 Web 框架
+- PostgreSQL 数据库 + SQLAlchemy ORM
+- Firebase Cloud Messaging 推送通知
+- JWT 认证
+- Celery + Redis 异步任务队列
+
+### AI 模型 (Python)
+- 哭声情绪分类：librosa (MFCC/Chroma/Spectral特征提取) + PyTorch CNN+BiLSTM 模型
+- 运动发育评估：MediaPipe Pose (33个骨骼关键点) + scikit-learn RandomForest
+- TensorFlow Lite 模型导出用于移动端推理
+
+### 移动端 (Flutter)
+- 跨平台 iOS/Android
+- tflite_flutter 本地推理
+- 实时音频采集 (flutter_sound)
+- 摄像头视频采集 (camera)
+- fl_chart 图表展示
+- 本地存储 + 云端同步
+
+## 核心功能要求
+
+### 1. 哭声情绪识别模块
+请实现以下完整流程：
+
+```python
+# ai_models/cry_emotion/feature_extraction.py
+# 从音频文件提取特征，包含：
+# - 13维 MFCC + delta + delta-delta (39维)
+# - 12维 Chroma 特征
+# - Spectral centroid, bandwidth, rolloff, ZCR (4维)
+# - 合计 55 维特征向量
+# 每个音频切分为 3 秒窗口，步长 1 秒
+
+# ai_models/cry_emotion/model.py
+# CNN+BiLSTM 模型架构：
+# Input(55, time_steps) → Conv1D(64) → Conv1D(128) → MaxPool
+# → BiLSTM(128) → Dropout(0.3) → Dense(64) → Dense(5, softmax)
+# 5类输出：hunger, pain, fatigue, discomfort, colic
+
+# ai_models/cry_emotion/train.py
+# 训练流程：
+# 1. 加载 donateacry-corpus 数据集
+# 2. 提取特征 + 数据增强（时间拉伸、音调偏移、加噪）
+# 3. 80/10/10 划分训练/验证/测试集
+# 4. Adam optimizer, lr=0.001, ReduceLROnPlateau
+# 5. 训练 50 epochs, early stopping patience=10
+# 6. 输出分类报告 + 混淆矩阵 + ROC 曲线
+# 7. 导出最优模型为 TFLite 格式
+```
+
+### 2. 运动发育评估模块
+请实现以下完整流程：
+
+```python
+# ai_models/motor_assessment/pose_extraction.py
+# 从视频提取姿态：
+# 1. MediaPipe Pose 提取每帧 33 个骨骼关键点 (x, y, z, visibility)
+# 2. 每秒采样 5 帧
+# 3. 输出关键点序列 numpy 数组
+
+# ai_models/motor_assessment/feature_engineering.py
+# 运动特征工程：
+# 1. 四肢运动幅度 (左臂/右臂/左腿/右腿 的角速度)
+# 2. 左右对称性指数 (左右肢体运动幅度比值)
+# 3. 运动频率 (每秒运动次数)
+# 4. 运动平滑度 (加速度变化率)
+# 5. 躯干稳定性 (躯干关键点的位移方差)
+# 6. 整体活跃度 (所有关键点位移的均值)
+# 合计 12 维特征向量
+
+# ai_models/motor_assessment/model.py
+# 两阶段模型：
+# Stage 1: RandomForest(n_estimators=100) 做初步筛查
+# Stage 2: LSTM(hidden=64, layers=2) 对时序特征做精细评估
+# 3类输出：normal(正常), attention(需关注), referral(建议就医)
+
+# ai_models/motor_assessment/train.py
+# 训练流程：
+# 1. 加载标注的婴儿运动视频数据
+# 2. 提取姿态 + 计算运动特征
+# 3. 训练 RandomForest 和 LSTM 模型
+# 4. 模型集成 (加权投票)
+# 5. 导出为 TFLite 格式
+```
+
+### 3. 后端 API
+
+```python
+# backend/main.py — FastAPI 应用
+# 路由：
+# POST /api/auth/register — 用户注册
+# POST /api/auth/login — 用户登录 (返回 JWT)
+# POST /api/baby — 创建宝宝档案
+# GET  /api/baby/{id} — 获取宝宝信息
+# POST /api/cry/analyze — 上传音频，返回情绪分类结果
+# POST /api/motor/assess — 上传视频，返回运动评估结果
+# GET  /api/records/{baby_id} — 获取历史记录
+# GET  /api/reports/{baby_id} — 生成发育报告
+# POST /api/notifications/settings — 设置告警规则
+
+# backend/models/record.py
+# 检测记录模型：
+# - id, baby_id, type(cry/motor), timestamp
+# - cry_result: {emotion, confidence, duration}
+# - motor_result: {assessment, score, details}
+# - audio_url / video_url (可选存储)
+```
+
+### 4. Flutter 移动端
+
+```dart
+// mobile/lib/screens/home_screen.dart
+// 首页布局：
+// - 顶部：当前宝宝信息 + 切换宝宝
+// - 中间：实时状态卡片（当前是否在哭、最近情绪、今日统计）
+// - 底部：两个大按钮 —— "开始哭声监测" / "运动发育评估"
+// - 底部导航：首页 / 历史 / 报告 / 设置
+
+// mobile/lib/screens/cry_monitor.dart
+// 哭声监测页：
+// - 实时音频波形显示
+// - 检测到哭声时显示情绪分类结果（图标+文字+置信度百分比）
+// - 安抚建议卡片（根据情绪类型显示不同建议）
+// - 本次监测时长和哭声次数统计
+
+// mobile/lib/screens/motor_assess.dart
+// 运动评估页：
+// - 摄像头预览 + 骨骼关键点实时绘制
+// - "开始录制"按钮，录制 30 秒
+// - 录制完成后显示评估结果（正常/需关注/建议就医）
+// - 详细指标展示（对称性、活跃度、平滑度等）
+
+// mobile/lib/services/tflite_service.dart
+// TFLite 本地推理服务：
+// - 加载 cry_classifier.tflite 和 motor_assessor.tflite
+// - 提供 classifyCry(audioData) 和 assessMotor(poseData) 方法
+// - 支持离线模式
+```
+
+### 5. 数据集下载脚本
+
+```bash
+#!/bin/bash
+# data/download_datasets.sh
+# 下载公开数据集：
+# 1. donateacry-corpus: 婴儿哭声数据集
+#    git clone https://github.com/gveres/donateacry-corpus.git data/raw/donateacry
+# 2. ESC-50: 环境声音数据集（含婴儿哭声类别）
+#    wget https://github.com/karolpiczak/ESC-50/archive/master.zip -O data/raw/esc50.zip
+# 3. 创建处理后的数据目录结构
+```
+
+### 6. Docker 部署
+
+```yaml
+# docker-compose.yml
+# 包含以下服务：
+# - backend: FastAPI 应用 (port 8000)
+# - db: PostgreSQL 15 (port 5432)
+# - redis: Redis 7 (port 6379)
+# - celery_worker: Celery 异步任务
+# 所有服务使用同一网络，有健康检查
+```
+
+### 7. CI/CD
+
+```yaml
+# .github/workflows/ci.yml
+# 触发条件：push to main, pull_request
+# 步骤：
+# 1. Python 3.11 环境
+# 2. 安装依赖
+# 3. 运行 pytest 测试
+# 4. 运行 flake8 代码检查
+# 5. 构建 Docker 镜像
+```
+
+### 8. 测试用例
+
+```python
+# tests/test_cry_classifier.py
+# - test_feature_extraction: 验证 MFCC 特征维度正确 (55维)
+# - test_model_prediction: 验证模型输出 5 类概率和为 1
+# - test_audio_preprocessing: 验证音频切分和重采样
+# - test_prediction_speed: 推理时间 < 500ms
+
+# tests/test_motor_analyzer.py
+# - test_pose_extraction: 验证 33 个关键点提取
+# - test_feature_computation: 验证 12 维特征计算
+# - test_symmetry_score: 验证对称性评分范围 [0, 1]
+# - test_assessment_output: 验证三分类输出
+
+# tests/test_api.py
+# - test_auth_flow: 注册 → 登录 → 获取 token
+# - test_cry_upload: 上传音频 → 返回分类结果
+# - test_motor_upload: 上传视频 → 返回评估结果
+# - test_unauthorized: 未登录访问返回 401
+```
+
+## 完整的 requirements.txt
+
+```
+# Web 框架
+fastapi==0.109.0
+uvicorn==0.27.0
+python-multipart==0.0.6
+
+# 数据库
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+
+# 认证
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# AI/ML
+torch==2.2.0
+torchaudio==2.2.0
+librosa==0.10.1
+mediapipe==0.10.9
+scikit-learn==1.4.0
+numpy==1.26.3
+pandas==2.2.0
+
+# TFLite 导出
+tensorflow==2.15.0
+
+# 异步任务
+celery==5.3.6
+redis==5.0.1
+
+# 推送通知
+firebase-admin==6.3.0
+
+# 报告生成
+reportlab==4.0.9
+matplotlib==3.8.2
+
+# 测试
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+
+# 代码质量
+flake8==7.0.0
+black==24.1.1
+```
+
+## 请按照以上结构和要求，生成所有文件的完整代码。每个文件都要是可运行的完整代码，不要省略任何部分。特别注意：
+1. 所有 Python 文件要有完整的 import 和错误处理
+2. Flutter 代码要有完整的 UI 布局和状态管理
+3. 包含所有配置文件（.env.example, docker-compose.yml, pubspec.yaml 等）
+4. 测试文件要有具体的测试逻辑，不只是 pass
+5. 所有代码要加中文注释说明
+```
+
+---
+
+### 💰 商业化路线图
+
+| 阶段 | 时间 | 目标 | 收入模式 |
+|------|------|------|---------|
+| **MVP** | 第 1–2 月 | 哭声识别 + 基础运动评估上线 | 免费获客 |
+| **v1.0** | 第 3–4 月 | 完善功能 + PDF 报告 + 离线模式 | Freemium 订阅 $4.99/月 |
+| **v1.5** | 第 5–6 月 | 接入 LLM 育儿助手 + 医生端 | 专业版 $9.99/月 |
+| **v2.0** | 第 7–12 月 | 社区 + B 端合作（儿科诊所/月子中心） | B 端 SaaS $99/月/机构 |
+| **v3.0** | 第 13–18 月 | 多语言国际化 + 学术合作发论文 | 全球市场 + 数据授权 |
+
+**预期 18 个月目标**：10 万+ 用户，月活 3 万+，月收入 $50K+
+
+---
+
+### 📊 技术指标要求
+
+| 指标 | 目标值 | 测试方法 |
+|------|--------|---------|
+| 哭声分类准确率 | ≥ 85% | 5-fold 交叉验证 on donateacry |
+| 哭声检测延迟 | < 3 秒 | 从哭声开始到结果返回 |
+| 运动评估准确率 | ≥ 80% | 与专业 GMA 评估对比 |
+| 视频处理帧率 | ≥ 15 FPS | MediaPipe on mid-range phone |
+| App 启动时间 | < 2 秒 | 冷启动到首页可用 |
+| 离线模型大小 | < 50 MB | TFLite 量化后总大小 |
+| API 响应时间 | < 500 ms | P95 延迟 |
+| 电池消耗 | < 5%/小时 | 后台哭声监测模式 |
+
+---
+
+### 🚀 快速启动命令
+
+**以下命令可在终端 / ChatGPT Codex / Cursor 中直接运行：**
+
+```bash
+# ====== 第 1 步：创建项目并安装环境 ======
+mkdir -p babycare-ai && cd babycare-ai
+python -m venv venv && source venv/bin/activate
+pip install fastapi uvicorn sqlalchemy librosa mediapipe scikit-learn \
+    torch torchaudio numpy pandas matplotlib reportlab pytest
+
+# ====== 第 2 步：下载训练数据 ======
+mkdir -p data/raw data/processed
+git clone https://github.com/gveres/donateacry-corpus.git data/raw/donateacry
+echo "✅ 数据集下载完成"
+
+# ====== 第 3 步：创建核心目录结构 ======
+mkdir -p backend/{models,api,services,database}
+mkdir -p ai_models/{cry_emotion,motor_assessment,pretrained}
+mkdir -p tests docs scripts
+echo "✅ 目录结构创建完成"
+
+# ====== 第 4 步：训练哭声分类模型 ======
+python -c "
+import os, librosa, numpy as np
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+import joblib
+
+# 特征提取
+def extract_features(file_path):
+    try:
+        y, sr = librosa.load(file_path, sr=22050, duration=3)
+        mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13), axis=1)
+        chroma = np.mean(librosa.feature.chroma_stft(y=y, sr=sr), axis=1)
+        spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+        zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+        return np.hstack([mfcc, chroma, spectral_centroid, zcr])
+    except:
+        return None
+
+# 加载数据
+data_dir = 'data/raw/donateacry/donateacry_corpus_cleaned_and_updated_data/'
+X, y_labels = [], []
+label_map = {'hungry': 0, 'pain': 1, 'tired': 2, 'discomfort': 3, 'burping': 4}
+
+if os.path.exists(data_dir):
+    for label_name, label_id in label_map.items():
+        label_dir = os.path.join(data_dir, label_name)
+        if os.path.isdir(label_dir):
+            for f in os.listdir(label_dir):
+                if f.endswith('.wav') or f.endswith('.ogg'):
+                    feat = extract_features(os.path.join(label_dir, f))
+                    if feat is not None:
+                        X.append(feat)
+                        y_labels.append(label_id)
+
+if len(X) > 10:
+    X = np.array(X)
+    y_labels = np.array(y_labels)
+    X_train, X_test, y_train, y_test = train_test_split(X, y_labels, test_size=0.2, random_state=42)
+    
+    model = GradientBoostingClassifier(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+    
+    print('=== 哭声分类模型评估 ===')
+    print(classification_report(y_test, model.predict(X_test), 
+          target_names=['hungry','pain','tired','discomfort','burping']))
+    
+    os.makedirs('ai_models/pretrained', exist_ok=True)
+    joblib.dump(model, 'ai_models/pretrained/cry_classifier.pkl')
+    print('✅ 模型已保存到 ai_models/pretrained/cry_classifier.pkl')
+else:
+    print('⚠️ 数据不足，请检查数据集目录结构')
+    # 生成演示模型
+    X_demo = np.random.randn(100, 26)
+    y_demo = np.random.randint(0, 5, 100)
+    model = GradientBoostingClassifier(n_estimators=50, random_state=42)
+    model.fit(X_demo, y_demo)
+    os.makedirs('ai_models/pretrained', exist_ok=True)
+    joblib.dump(model, 'ai_models/pretrained/cry_classifier.pkl')
+    print('✅ 演示模型已保存')
+"
+
+# ====== 第 5 步：创建 FastAPI 后端 ======
+cat > backend/main.py << 'PYEOF'
+"""BabyCare AI 后端服务入口"""
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
+import librosa
+import joblib
+import tempfile
+import os
+
+app = FastAPI(title="BabyCare AI", version="1.0.0", description="智能婴儿哭声情绪识别 API")
+
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+# 加载模型
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "ai_models", "pretrained", "cry_classifier.pkl")
+cry_model = None
+EMOTION_LABELS = ["饥饿(hungry)", "疼痛(pain)", "疲倦(tired)", "不适(discomfort)", "胀气(burping)"]
+
+@app.on_event("startup")
+def load_models():
+    global cry_model
+    if os.path.exists(MODEL_PATH):
+        cry_model = joblib.load(MODEL_PATH)
+        print(f"✅ 哭声分类模型加载成功: {MODEL_PATH}")
+    else:
+        print(f"⚠️ 模型文件未找到: {MODEL_PATH}")
+
+def extract_features(file_path):
+    y, sr = librosa.load(file_path, sr=22050, duration=3)
+    mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13), axis=1)
+    chroma = np.mean(librosa.feature.chroma_stft(y=y, sr=sr), axis=1)
+    spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+    zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+    return np.hstack([mfcc, chroma, spectral_centroid, zcr]).reshape(1, -1)
+
+@app.get("/")
+def root():
+    return {"message": "BabyCare AI API 运行中", "version": "1.0.0"}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "model_loaded": cry_model is not None}
+
+@app.post("/api/cry/analyze")
+async def analyze_cry(audio: UploadFile = File(...)):
+    """上传婴儿哭声音频，返回情绪分类结果"""
+    if cry_model is None:
+        raise HTTPException(status_code=503, detail="模型未加载")
+    
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+        content = await audio.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+    
+    try:
+        features = extract_features(tmp_path)
+        probabilities = cry_model.predict_proba(features)[0]
+        predicted_class = int(np.argmax(probabilities))
+        
+        return {
+            "emotion": EMOTION_LABELS[predicted_class],
+            "confidence": float(probabilities[predicted_class]),
+            "all_probabilities": {EMOTION_LABELS[i]: float(p) for i, p in enumerate(probabilities)},
+            "recommendation": get_recommendation(predicted_class)
+        }
+    finally:
+        os.unlink(tmp_path)
+
+def get_recommendation(emotion_id):
+    recommendations = {
+        0: "宝宝可能饿了，建议尝试喂奶或辅食",
+        1: "宝宝可能感到疼痛，请检查是否有不适，必要时就医",
+        2: "宝宝可能困了，建议营造安静环境帮助入睡",
+        3: "宝宝可能不舒服，检查尿布、衣物或环境温度",
+        4: "宝宝可能需要拍嗝，轻拍背部帮助排气"
+    }
+    return recommendations.get(emotion_id, "请关注宝宝状态")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+PYEOF
+
+echo "✅ FastAPI 后端创建完成"
+
+# ====== 第 6 步：启动后端服务 ======
+echo ""
+echo "======================================"
+echo "  BabyCare AI 项目搭建完成！"
+echo "======================================"
+echo ""
+echo "启动后端: cd babycare-ai && python -m uvicorn backend.main:app --reload"
+echo "API 文档: http://localhost:8000/docs"
+echo "健康检查: http://localhost:8000/health"
+echo ""
+```
+
+---
+
+### 📌 命令速查表（适用于 Claude Code / Cursor / Codex）
+
+```bash
+# —— 环境与项目 ——
+pip install fastapi uvicorn librosa mediapipe scikit-learn torch pandas  # 安装依赖
+python -m uvicorn backend.main:app --reload --port 8000                  # 启动后端
+curl http://localhost:8000/health                                        # 健康检查
+curl -X POST http://localhost:8000/api/cry/analyze -F "audio=@baby.wav"  # 测试哭声分析
+
+# —— 模型训练 ——
+python ai_models/cry_emotion/train.py                   # 训练哭声分类模型
+python ai_models/motor_assessment/train.py              # 训练运动评估模型
+python ai_models/cry_emotion/export_tflite.py           # 导出 TFLite 模型
+
+# —— 测试 ——
+pytest tests/ -v                                        # 运行所有测试
+pytest tests/test_cry_classifier.py -v                  # 测试哭声分类
+pytest tests/test_api.py -v                             # 测试 API
+
+# —— Docker 部署 ——
+docker-compose up -d                                    # 启动所有服务
+docker-compose logs -f backend                          # 查看后端日志
+
+# —— Flutter 移动端 ——
+cd mobile && flutter pub get                            # 安装 Flutter 依赖
+flutter run                                             # 运行 App
+flutter build apk --release                             # 构建 Android APK
+flutter build ios --release                             # 构建 iOS
+```
+
+---
+
 ## 完成情况统计
 
 ```
