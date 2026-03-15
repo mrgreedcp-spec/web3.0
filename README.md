@@ -1276,17 +1276,19 @@ def analyze_movement(keypoints_json="keypoints.json"):
     avg_movement = np.mean(movements)
     std_movement = np.std(movements)
 
+    # MediaPipe Pose 关键点索引（参考：https://google.github.io/mediapipe/solutions/pose）
+    LEFT_WRIST, RIGHT_WRIST = 15, 16
+    LEFT_ANKLE, RIGHT_ANKLE = 27, 28
+
     # 左右对称性（比较左右手腕、左右脚踝）
     symmetry_scores = []
     for frame in frames:
         kps = frame["keypoints"]
-        # 左手腕(15) vs 右手腕(16)
-        left_wrist_y = kps[15]["y"]
-        right_wrist_y = kps[16]["y"]
+        left_wrist_y = kps[LEFT_WRIST]["y"]
+        right_wrist_y = kps[RIGHT_WRIST]["y"]
         wrist_sym = abs(left_wrist_y - right_wrist_y)
-        # 左脚踝(27) vs 右脚踝(28)
-        left_ankle_y = kps[27]["y"]
-        right_ankle_y = kps[28]["y"]
+        left_ankle_y = kps[LEFT_ANKLE]["y"]
+        right_ankle_y = kps[RIGHT_ANKLE]["y"]
         ankle_sym = abs(left_ankle_y - right_ankle_y)
         symmetry_scores.append((wrist_sym + ankle_sym) / 2)
 
@@ -1300,10 +1302,13 @@ def analyze_movement(keypoints_json="keypoints.json"):
     print(f"运动变异性 (std): {std_movement:.4f}")
     print(f"左右对称性偏差: {avg_symmetry:.4f} (越小越对称)")
     print()
+    # 阈值说明：MediaPipe 坐标是 0–1 归一化值
+    # 0.15 表示左右偏差超过画面高度的 15%，经验性阈值，可按实际调整
     if avg_symmetry > 0.15:
         print("⚠️ 提示：左右运动不太对称，建议关注")
     else:
         print("✅ 左右运动较为对称")
+    # 0.01 表示归一化坐标位移的标准差很低，说明几乎没有活动
     if std_movement < 0.01:
         print("⚠️ 提示：运动变异性较低，活动偏少")
     else:
@@ -1358,7 +1363,7 @@ def realtime_cry_monitor(clf):
 
             # 检测音量（是否有哭声）
             rms = np.sqrt(np.mean(y**2))
-            if rms < 0.02:  # 静音阈值
+            if rms < 0.02:  # 静音阈值（float32 音频，范围 -1~1，可按环境噪音调整）
                 continue
 
             # 提取 MFCC 特征
