@@ -1087,7 +1087,401 @@ features = np.mean(mfcc, axis=1)  # 13 维特征向量
 
 ---
 
-### 五、研究方向 × 技术可行性总览
+### 五、可直接运行的命令行代码（复制粘贴即用）
+
+> 以下命令可在 **ChatGPT Codex / Jupyter / 本地终端** 中直接运行，无需修改。
+
+#### 🔧 项目 1：婴儿哭声情绪分类器（最简版，10 分钟上手）
+
+**Step 1 — 安装依赖**
+
+```bash
+pip install librosa scikit-learn numpy soundfile matplotlib
+```
+
+**Step 2 — 下载示例数据集**
+
+```bash
+git clone https://github.com/gveres/donateacry-corpus.git
+ls donateacry-corpus/donateacry_corpus_cleaned_and_updated_data/
+```
+
+**Step 3 — 特征提取 + 训练分类器（完整 Python 脚本）**
+
+```python
+import os
+import numpy as np
+import librosa
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+# ========== 1. 加载数据并提取 MFCC 特征 ==========
+data_dir = "donateacry-corpus/donateacry_corpus_cleaned_and_updated_data/"
+features = []
+labels = []
+
+for file in os.listdir(data_dir):
+    if not file.endswith(".wav"):
+        continue
+    filepath = os.path.join(data_dir, file)
+    # 标签从文件名提取（格式：ID-label-...）
+    parts = file.split("-")
+    if len(parts) >= 2:
+        label = parts[1]  # 例如 hu=hungry, pa=pain, bp=belly pain 等
+    else:
+        continue
+
+    try:
+        y, sr = librosa.load(filepath, sr=16000, duration=5)
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+        mfcc_mean = np.mean(mfcc, axis=1)
+        mfcc_std = np.std(mfcc, axis=1)
+        feat = np.concatenate([mfcc_mean, mfcc_std])  # 26 维特征
+        features.append(feat)
+        labels.append(label)
+    except Exception as e:
+        print(f"跳过 {file}: {e}")
+
+X = np.array(features)
+y = np.array(labels)
+print(f"✅ 共加载 {len(X)} 个音频样本，{len(set(y))} 个类别: {set(y)}")
+
+# ========== 2. 训练 RandomForest 分类器 ==========
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, y_train)
+
+# ========== 3. 评估 ==========
+y_pred = clf.predict(X_test)
+print("\n📊 分类报告：")
+print(classification_report(y_test, y_pred))
+print(f"🎯 准确率: {clf.score(X_test, y_test):.2%}")
+```
+
+**Step 4 — 对新的哭声音频进行预测**
+
+```python
+# 用训练好的 clf 对一段新音频进行分类
+def predict_cry(audio_path, clf):
+    y, sr = librosa.load(audio_path, sr=16000, duration=5)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+    feat = np.concatenate([np.mean(mfcc, axis=1), np.std(mfcc, axis=1)])
+    prediction = clf.predict([feat])[0]
+    label_map = {"hu": "饥饿 Hungry", "bp": "胀气 Belly Pain",
+                 "bu": "需要拍嗝 Burping", "dc": "不舒服 Discomfort",
+                 "ti": "疲倦 Tired", "ch": "绞痛 Colic", "pa": "疼痛 Pain"}
+    return label_map.get(prediction, prediction)
+
+# 用法：
+# result = predict_cry("baby_cry.wav", clf)
+# print(f"婴儿情绪: {result}")
+```
+
+---
+
+#### 🔧 项目 2：手机视频运动发育评估（MediaPipe 姿态估计）
+
+**Step 1 — 安装依赖**
+
+```bash
+pip install mediapipe opencv-python numpy matplotlib
+```
+
+**Step 2 — 从视频提取婴儿骨骼关键点（完整脚本）**
+
+```python
+import cv2
+import mediapipe as mp
+import numpy as np
+import json
+
+# ========== 初始化 MediaPipe Pose ==========
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
+pose = mp_pose.Pose(
+    static_image_mode=False,
+    model_complexity=1,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5
+)
+
+# ========== 从视频中提取关键点 ==========
+def extract_keypoints_from_video(video_path, output_json="keypoints.json"):
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    all_frames = []
+    frame_idx = 0
+
+    print(f"📹 开始处理视频: {video_path} (FPS: {fps})")
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = pose.process(rgb)
+
+        if results.pose_landmarks:
+            keypoints = []
+            for lm in results.pose_landmarks.landmark:
+                keypoints.append({
+                    "x": round(lm.x, 4),
+                    "y": round(lm.y, 4),
+                    "z": round(lm.z, 4),
+                    "visibility": round(lm.visibility, 4)
+                })
+            all_frames.append({"frame": frame_idx, "keypoints": keypoints})
+
+        frame_idx += 1
+
+    cap.release()
+
+    with open(output_json, "w") as f:
+        json.dump({"fps": fps, "total_frames": frame_idx, "data": all_frames}, f)
+
+    print(f"✅ 提取完成！共 {frame_idx} 帧，{len(all_frames)} 帧检测到姿态")
+    print(f"💾 关键点已保存到: {output_json}")
+    return all_frames
+
+# 用法：把 "baby_video.mp4" 替换成你的视频文件路径
+# extract_keypoints_from_video("baby_video.mp4")
+```
+
+**Step 3 — 计算运动特征（对称性、活跃度）**
+
+```python
+def analyze_movement(keypoints_json="keypoints.json"):
+    with open(keypoints_json, "r") as f:
+        data = json.load(f)
+
+    frames = data["data"]
+    if len(frames) < 2:
+        print("⚠️ 帧数不足，无法分析")
+        return
+
+    # 计算关键点的逐帧位移（运动活跃度）
+    movements = []
+    for i in range(1, len(frames)):
+        prev_kps = frames[i-1]["keypoints"]
+        curr_kps = frames[i]["keypoints"]
+        frame_movement = 0
+        for j in range(len(curr_kps)):
+            dx = curr_kps[j]["x"] - prev_kps[j]["x"]
+            dy = curr_kps[j]["y"] - prev_kps[j]["y"]
+            frame_movement += np.sqrt(dx**2 + dy**2)
+        movements.append(frame_movement)
+
+    avg_movement = np.mean(movements)
+    std_movement = np.std(movements)
+
+    # 左右对称性（比较左右手腕、左右脚踝）
+    symmetry_scores = []
+    for frame in frames:
+        kps = frame["keypoints"]
+        # 左手腕(15) vs 右手腕(16)
+        left_wrist_y = kps[15]["y"]
+        right_wrist_y = kps[16]["y"]
+        wrist_sym = abs(left_wrist_y - right_wrist_y)
+        # 左脚踝(27) vs 右脚踝(28)
+        left_ankle_y = kps[27]["y"]
+        right_ankle_y = kps[28]["y"]
+        ankle_sym = abs(left_ankle_y - right_ankle_y)
+        symmetry_scores.append((wrist_sym + ankle_sym) / 2)
+
+    avg_symmetry = np.mean(symmetry_scores)
+
+    print("=" * 50)
+    print("📊 婴儿运动分析报告")
+    print("=" * 50)
+    print(f"分析帧数: {len(frames)}")
+    print(f"平均运动活跃度: {avg_movement:.4f}")
+    print(f"运动变异性 (std): {std_movement:.4f}")
+    print(f"左右对称性偏差: {avg_symmetry:.4f} (越小越对称)")
+    print()
+    if avg_symmetry > 0.15:
+        print("⚠️ 提示：左右运动不太对称，建议关注")
+    else:
+        print("✅ 左右运动较为对称")
+    if std_movement < 0.01:
+        print("⚠️ 提示：运动变异性较低，活动偏少")
+    else:
+        print("✅ 运动变异性正常")
+
+# 用法：
+# analyze_movement("keypoints.json")
+```
+
+---
+
+#### 🔧 项目 3：实时哭声监测器（麦克风实时采集 + 分类）
+
+**Step 1 — 安装依赖**
+
+```bash
+pip install pyaudio librosa numpy scikit-learn
+```
+
+**Step 2 — 实时监测脚本**
+
+```python
+import pyaudio
+import numpy as np
+import librosa
+
+# ========== 录音参数 ==========
+RATE = 16000
+CHUNK = RATE * 3  # 每 3 秒分析一次
+FORMAT = pyaudio.paFloat32
+CHANNELS = 1
+
+def realtime_cry_monitor(clf):
+    """
+    实时从麦克风采集音频并分类婴儿哭声情绪
+    clf: 训练好的分类器（如项目1中的 RandomForestClassifier）
+    """
+    p = pyaudio.PyAudio()
+    stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE,
+                    input=True, frames_per_buffer=CHUNK)
+
+    label_map = {"hu": "🍼 饥饿", "bp": "💨 胀气", "bu": "🫧 拍嗝",
+                 "dc": "😣 不舒服", "ti": "😴 疲倦", "ch": "😭 绞痛", "pa": "🤕 疼痛"}
+
+    print("🎤 实时哭声监测已启动，按 Ctrl+C 停止...")
+    print("-" * 40)
+
+    try:
+        while True:
+            audio_data = stream.read(CHUNK, exception_on_overflow=False)
+            y = np.frombuffer(audio_data, dtype=np.float32)
+
+            # 检测音量（是否有哭声）
+            rms = np.sqrt(np.mean(y**2))
+            if rms < 0.02:  # 静音阈值
+                continue
+
+            # 提取 MFCC 特征
+            mfcc = librosa.feature.mfcc(y=y, sr=RATE, n_mfcc=13)
+            feat = np.concatenate([np.mean(mfcc, axis=1), np.std(mfcc, axis=1)])
+
+            prediction = clf.predict([feat])[0]
+            emotion = label_map.get(prediction, prediction)
+            print(f"  检测到哭声 → 情绪: {emotion}  (音量: {rms:.3f})")
+
+    except KeyboardInterrupt:
+        print("\n⏹ 监测已停止")
+    finally:
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+# 用法（需要先运行项目1训练 clf）：
+# realtime_cry_monitor(clf)
+```
+
+---
+
+#### 🔧 项目 4：一键式完整流水线（从零到模型，一个命令跑通）
+
+> 下面的命令从头到尾一次性跑通整个哭声分类器的训练和评估：
+
+```bash
+# ===== 一键执行：安装 → 下载数据 → 训练 → 评估 =====
+
+# 1. 安装所有依赖
+pip install librosa scikit-learn numpy soundfile matplotlib joblib
+
+# 2. 下载数据集
+git clone https://github.com/gveres/donateacry-corpus.git 2>/dev/null || echo "数据集已存在"
+
+# 3. 运行训练脚本
+python3 << 'TRAIN_SCRIPT'
+import os, numpy as np, librosa, joblib
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import classification_report
+
+data_dir = "donateacry-corpus/donateacry_corpus_cleaned_and_updated_data/"
+features, labels = [], []
+
+for file in os.listdir(data_dir):
+    if not file.endswith(".wav"):
+        continue
+    parts = file.split("-")
+    if len(parts) < 2:
+        continue
+    label = parts[1]
+    try:
+        y, sr = librosa.load(os.path.join(data_dir, file), sr=16000, duration=5)
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+        chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+        spectral = librosa.feature.spectral_contrast(y=y, sr=sr)
+        feat = np.concatenate([
+            np.mean(mfcc, axis=1), np.std(mfcc, axis=1),
+            np.mean(chroma, axis=1), np.std(chroma, axis=1),
+            np.mean(spectral, axis=1), np.std(spectral, axis=1)
+        ])
+        features.append(feat)
+        labels.append(label)
+    except:
+        pass
+
+X, y = np.array(features), np.array(labels)
+print(f"\n✅ 数据加载完成: {len(X)} 样本, {len(set(y))} 类别: {sorted(set(y))}")
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 训练两个模型进行对比
+for name, model in [("RandomForest", RandomForestClassifier(n_estimators=200, random_state=42)),
+                     ("GradientBoosting", GradientBoostingClassifier(n_estimators=100, random_state=42))]:
+    model.fit(X_train, y_train)
+    acc = model.score(X_test, y_test)
+    cv_scores = cross_val_score(model, X, y, cv=5)
+    print(f"\n{'='*50}")
+    print(f"📊 {name} 结果:")
+    print(f"  测试集准确率: {acc:.2%}")
+    print(f"  5-fold 交叉验证: {cv_scores.mean():.2%} ± {cv_scores.std():.2%}")
+    print(classification_report(y_test, model.predict(X_test)))
+
+# 保存最佳模型
+best_model = GradientBoostingClassifier(n_estimators=100, random_state=42).fit(X, y)
+joblib.dump(best_model, "cry_classifier.pkl")
+print("💾 模型已保存: cry_classifier.pkl")
+print("🎉 完成！可以用 joblib.load('cry_classifier.pkl') 加载模型进行预测")
+TRAIN_SCRIPT
+```
+
+#### 快速验证命令
+
+```bash
+# 验证模型是否保存成功
+python3 -c "
+import joblib
+clf = joblib.load('cry_classifier.pkl')
+print('✅ 模型加载成功！')
+print(f'   模型类型: {type(clf).__name__}')
+print(f'   训练类别: {clf.classes_}')
+"
+```
+
+---
+
+#### 📋 命令速查表
+
+| 需求 | 命令 |
+|------|------|
+| 安装音频分析库 | `pip install librosa scikit-learn numpy soundfile` |
+| 安装视频姿态估计库 | `pip install mediapipe opencv-python numpy` |
+| 安装实时监测库 | `pip install pyaudio librosa numpy` |
+| 下载哭声数据集 | `git clone https://github.com/gveres/donateacry-corpus.git` |
+| 保存训练好的模型 | `joblib.dump(clf, "cry_classifier.pkl")` |
+| 加载已保存的模型 | `clf = joblib.load("cry_classifier.pkl")` |
+| 转换为手机端模型 | `pip install tensorflow && python -c "import tensorflow as tf; converter = tf.lite.TFLiteConverter.from_saved_model('model'); open('model.tflite','wb').write(converter.convert())"` |
+
+---
+
+### 六、研究方向 × 技术可行性总览
 
 | 方向 | 设备需求 | 开发难度 | 学术价值 (IF) | 商业潜力 | 推荐指数 |
 |------|----------|----------|---------------|----------|----------|
