@@ -1,0 +1,6 @@
+node_modules/
+.env
+data/wallets.enc
+data/bot.log
+data/activity-log.json
+data/opportunities.json
