@@ -6,17 +6,23 @@
   "scripts": {
     "setup": "node scripts/setup.js",
     "start": "node index.js",
+    "daemon": "npx pm2 start index.js --name airdrop-bot --cron-restart=\"0 0 * * *\"",
+    "daemon:stop": "npx pm2 stop airdrop-bot",
+    "daemon:logs": "npx pm2 logs airdrop-bot",
+    "daemon:status": "npx pm2 status",
+    "daemon:startup": "npx pm2 startup && npx pm2 save",
     "status": "node scripts/status.js",
     "claim": "node -e \"require('./src/faucets').runAll().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); })\"",
     "interact": "node -e \"require('./src/protocols').runAll().then(() => process.exit(0)).catch(e => { console.error(e); process.exit(1); })\""
   },
   "dependencies": {
-    "ethers": "^6.13.0",
-    "node-cron": "^3.0.3",
-    "dotenv": "^16.4.0",
     "axios": "^1.7.0",
     "chalk": "^4.1.2",
+    "dotenv": "^16.4.0",
+    "ethers": "^6.13.0",
     "inquirer": "^8.2.6",
-    "ora": "^5.4.1"
+    "node-cron": "^3.0.3",
+    "ora": "^5.4.1",
+    "pm2": "^6.0.14"
   }
 }
