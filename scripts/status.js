@@ -73,6 +73,14 @@ async function main() {
     console.log(chalk.gray('    No cached opportunities. They will be fetched when the bot runs.'));
   }
 
+  // Funding tracker (information advantage)
+  const fundingRounds = tracker.loadCachedFunding();
+  if (fundingRounds.length > 0) {
+    tracker.displayFunding(fundingRounds);
+  } else {
+    console.log(chalk.gray('\n    No funding data yet. It will be fetched when the bot runs.'));
+  }
+
   // Schedules
   console.log(chalk.bold('\n  Schedules:'));
   console.log(`    Faucet claims:        ${chalk.cyan(config.faucetSchedule)}`);
