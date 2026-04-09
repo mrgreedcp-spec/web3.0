@@ -45,6 +45,23 @@ function validate() {
   if (config.walletCount < 1 || config.walletCount > 10) {
     errors.push('WALLET_COUNT must be between 1 and 10');
   }
+
+  // SAFETY: Block mainnet RPC endpoints to prevent accidental real fund usage
+  const mainnetKeywords = ['mainnet', 'eth.llamarpc.com', 'cloudflare-eth', 'rpc.ankr.com/eth'];
+  const mainnetChainIds = [];
+  for (const [name, url] of Object.entries(config.rpc)) {
+    const lower = (url || '').toLowerCase();
+    // Block if URL doesn't contain 'sepolia', 'testnet', 'goerli', or 'holesky'
+    const isTestnet = /sepolia|testnet|goerli|holesky/.test(lower);
+    const isMainnet = mainnetKeywords.some((kw) => lower.includes(kw));
+    if (isMainnet || (!isTestnet && lower.startsWith('http'))) {
+      errors.push(
+        `SAFETY BLOCK: RPC for "${name}" (${url}) does not appear to be a testnet. ` +
+        'This bot is designed for testnets ONLY. Using mainnet RPCs could result in real fund loss.'
+      );
+    }
+  }
+
   return errors;
 }
 

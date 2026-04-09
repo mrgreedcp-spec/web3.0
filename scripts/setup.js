@@ -123,8 +123,8 @@ async function main() {
     '',
   ].join('\n');
 
-  fs.writeFileSync(ENV_FILE, envContent);
-  console.log(chalk.green('  ✓ Configuration saved to .env'));
+  fs.writeFileSync(ENV_FILE, envContent, { mode: 0o600 }); // Owner read/write only
+  console.log(chalk.green('  ✓ Configuration saved to .env (permissions: owner-only)'));
 
   // Create data directory
   if (!fs.existsSync(DATA_DIR)) {
