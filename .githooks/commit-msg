@@ -1,0 +1,23 @@
+#!/bin/bash
+# Rejects commit messages that break the rules in AGENTS.md:
+#   - no Co-Authored-By trailer (agents must not add themselves as co-author)
+#   - no em dash (U+2014); use a plain dash "-"
+# Enable once per clone: git config core.hooksPath .githooks
+set -euo pipefail
+
+msg_file="$1"
+# Lines starting with "#" are stripped by git before committing, so ignore them.
+body="$(grep -v '^#' "$msg_file" || true)"
+status=0
+
+if grep -qi '^co-authored-by:' <<<"$body"; then
+  echo "commit-msg: remove the Co-Authored-By trailer. Never add an agent as co-author (see AGENTS.md)." >&2
+  status=1
+fi
+
+if grep -q $'\xe2\x80\x94' <<<"$body"; then
+  echo "commit-msg: the message contains an em dash (U+2014). Use a plain dash \"-\" instead (see AGENTS.md)." >&2
+  status=1
+fi
+
+exit "$status"

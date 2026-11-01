@@ -19,11 +19,10 @@ import argparse
 import csv
 import json
 import os
-import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 # ---------------------------------------------------------------- 主题规则
@@ -263,9 +262,17 @@ def summarize(sessions: dict[str, Session], start: datetime, end: datetime) -> d
             if s.prompts <= SHORT_SESSION_PROMPTS:
                 short_count += 1
                 short_overhead += per_session[s.sid].total
-    return dict(by_topic=by_topic, by_model=by_model, overall=overall, per_session=per_session,
-                first_req_ctx=first_req_ctx, short_count=short_count, short_overhead=short_overhead,
-                long_ctx_reqs=long_ctx_reqs, fast_reqs=fast_reqs)
+    return {
+        "by_topic": by_topic,
+        "by_model": by_model,
+        "overall": overall,
+        "per_session": per_session,
+        "first_req_ctx": first_req_ctx,
+        "short_count": short_count,
+        "short_overhead": short_overhead,
+        "long_ctx_reqs": long_ctx_reqs,
+        "fast_reqs": fast_reqs,
+    }
 
 
 # ---------------------------------------------------------------- 输出
@@ -285,7 +292,8 @@ def pct(x: float) -> str:
 def render(sessions, res, start, end, prev=None) -> str:
     o: Agg = res["overall"]
     L = []
-    L.append(f"# Claude Code token 统计 {start.astimezone():%Y-%m-%d} ~ {(end - timedelta(seconds=1)).astimezone():%Y-%m-%d}\n")
+    last_day = end - timedelta(seconds=1)
+    L.append(f"# Claude Code token 统计 {start.astimezone():%Y-%m-%d} ~ {last_day.astimezone():%Y-%m-%d}\n")
     if not o.reqs:
         L.append("这段时间没有找到用量记录。\n")
         return "\n".join(L)
@@ -294,15 +302,21 @@ def render(sessions, res, start, end, prev=None) -> str:
     L.append("| 指标 | 本期 |" + (" 上期 | 变化 |" if prev else ""))
     L.append("|---|---|" + ("---|---|" if prev else ""))
 
-    def row(name, cur, old=None, f=fmt, lower_is_better=True):
+    # 上期没有任何请求时，比例和均值没有意义，环比也无从谈起，统一显示 "-"
+    prev_empty = prev is not None and not prev["overall"].reqs
+
+    def row(name, cur, old=None, f=fmt, derived=False):
         if prev is None:
             L.append(f"| {name} | {f(cur)} |")
             return
-        if isinstance(cur, float) and f is pct:
+        old_cell = "-" if prev_empty and derived else f(old)
+        if prev_empty:
+            delta = "-"
+        elif isinstance(cur, float) and f is pct:
             delta = f"{(cur - old) * 100:+.1f} 个百分点"
         else:
-            delta = f"{(cur / old - 1) * 100:+.0f}%" if old else "—"
-        L.append(f"| {name} | {f(cur)} | {f(old)} | {delta} |")
+            delta = f"{(cur / old - 1) * 100:+.0f}%" if old else "-"
+        L.append(f"| {name} | {f(cur)} | {old_cell} | {delta} |")
 
     po: Agg | None = prev["overall"] if prev else None
     row("会话数", len(o.sessions), len(po.sessions) if po else None, f=lambda x: str(int(x)))
@@ -313,15 +327,15 @@ def render(sessions, res, start, end, prev=None) -> str:
     row("　其中 缓存读取", o.cache_read, po.cache_read if po else None)
     row("　其中 输出", o.output, po.output if po else None)
     row("折算 token（按计价倍率）", o.weighted, po.weighted if po else None)
-    row("缓存节约比例", o.cache_saving, po.cache_saving if po else None, f=pct)
+    row("缓存节约比例", o.cache_saving, po.cache_saving if po else None, f=pct, derived=True)
     fr = res["first_req_ctx"]
     pfr = prev["first_req_ctx"] if prev else []
     avg_fr = sum(fr) / len(fr) if fr else 0
     avg_pfr = sum(pfr) / len(pfr) if pfr else 0
-    row("新会话首轮固定开销（均值）", avg_fr, avg_pfr if prev else None)
+    row("新会话首轮固定开销（均值）", avg_fr, avg_pfr if prev else None, derived=True)
     avg_ctx = (o.input + o.cache_write + o.cache_read) / o.reqs
     pavg_ctx = (po.input + po.cache_write + po.cache_read) / po.reqs if po and po.reqs else 0
-    row("每次请求平均上下文", avg_ctx, pavg_ctx if prev else None)
+    row("每次请求平均上下文", avg_ctx, pavg_ctx if prev else None, derived=True)
     L.append("")
 
     # 节约比例说明
