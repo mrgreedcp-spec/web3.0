@@ -1,0 +1,4 @@
+data/
+shop.duckdb
+shop.duckdb.wal
+__pycache__/
