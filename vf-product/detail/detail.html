@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>VF 果蔬脆 · 电商详情页长图</title>
+<style>
+  /* 详情页宽度：淘宝/天猫/京东手机端通用 750px。如平台要求 790px，改这里即可 */
+  :root {
+    --w: 750px;
+    --brand: #e8a33d;
+    --brand-dark: #b8761a;
+    --green: #6a9a45;
+    --ink: #2b2620;
+    --muted: #7a7064;
+    --cream: #fff8ec;
+    --line: #efe2cc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: var(--w);
+    margin: 0 auto;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "WenQuanYi Zen Hei", sans-serif;
+    color: var(--ink);
+    background: var(--cream);
+    -webkit-font-smoothing: antialiased;
+  }
+  .m { position: relative; width: var(--w); padding: 80px 48px; overflow: hidden; }
+  .en { font-size: 20px; letter-spacing: .3em; color: var(--brand-dark); font-weight: 700; text-align: center; }
+  .h { font-size: 56px; font-weight: 800; line-height: 1.25; text-align: center; margin: 14px 0 18px; }
+  .h em { font-style: normal; color: var(--brand-dark); }
+  .sub { font-size: 26px; line-height: 1.7; color: var(--muted); text-align: center; }
+  .bar { width: 64px; height: 6px; border-radius: 3px; background: var(--brand); margin: 0 auto 36px; }
+  .ph { display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,.38); font-size: 24px; letter-spacing: .15em; border-radius: 28px; }
+
+  /* 01 首屏海报 */
+  .hero { padding: 0; height: 1180px; background: linear-gradient(180deg, #ffe7b8 0%, #fff4dd 55%, var(--cream) 100%); }
+  .hero .brand { position: absolute; top: 48px; left: 48px; font-size: 26px; font-weight: 700; }
+  .hero .badge { position: absolute; top: 40px; right: 48px; background: var(--ink); color: #fff; font-size: 22px; padding: 10px 22px; border-radius: 999px; }
+  .hero .title { position: absolute; top: 140px; width: 100%; text-align: center; }
+  .hero .title .t1 { font-size: 92px; font-weight: 900; line-height: 1.15; letter-spacing: 4px; }
+  .hero .title .t1 em { font-style: normal; color: var(--brand-dark); }
+  .hero .title .t2 { margin-top: 20px; font-size: 30px; color: var(--muted); letter-spacing: 2px; }
+  .hero .plate { position: absolute; top: 470px; left: 50%; transform: translateX(-50%); width: 520px; height: 520px; border-radius: 50%; background: conic-gradient(from 210deg, #f6c560, #e8a33d, #f3d27e, #a7c977, #f6c560); box-shadow: 0 40px 80px rgba(184,118,26,.28); }
+  .hero .plate .ph { position: absolute; inset: 60px; border-radius: 50%; background: rgba(255,255,255,.8); }
+  .hero .temp { position: absolute; top: 520px; right: 40px; width: 170px; height: 170px; border-radius: 50%; background: var(--brand-dark); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 16px 36px rgba(184,118,26,.4); }
+  .hero .temp b { font-size: 50px; line-height: 1; }
+  .hero .temp span { font-size: 20px; margin-top: 8px; }
+  .hero .icons { position: absolute; bottom: 48px; left: 48px; right: 48px; display: flex; justify-content: space-between; }
+  .hero .icons div { width: 200px; text-align: center; background: #fff; border-radius: 20px; padding: 20px 0; font-size: 26px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.05); }
+  .hero .icons small { display: block; font-size: 18px; color: var(--muted); font-weight: 400; margin-top: 4px; }
+
+  /* 02 对比 */
+  .vs { background: #fff; }
+  .vs .row { display: flex; gap: 20px; margin-top: 48px; }
+  .vs .col { flex: 1; border-radius: 28px; padding: 36px 28px; }
+  .vs .bad { background: #f2eeea; color: #6b625a; }
+  .vs .good { background: linear-gradient(180deg, #fff1d6, #ffe2ad); border: 3px solid var(--brand); }
+  .vs .col h3 { font-size: 32px; text-align: center; margin-bottom: 8px; }
+  .vs .col .deg { font-size: 64px; font-weight: 900; text-align: center; line-height: 1.2; white-space: nowrap; letter-spacing: -1px; }
+  .vs .bad .deg { font-size: 50px; line-height: 77px; }
+  .vs .bad .deg { color: #a5978a; }
+  .vs .good .deg { color: var(--brand-dark); }
+  .vs .col .ph { height: 220px; margin: 24px 0; }
+  .vs .bad .ph { background: linear-gradient(135deg, #c9a77d, #8b6a46); color: rgba(255,255,255,.7); }
+  .vs .good .ph { background: linear-gradient(135deg, #ffd66b, #f0a830); }
+  .vs ul { list-style: none; font-size: 26px; line-height: 2.1; }
+  .vs .bad li::before { content: "✕  "; color: #b4a596; font-weight: 700; }
+  .vs .good li::before { content: "✓  "; color: var(--green); font-weight: 900; }
+
+  /* 03 原理 */
+  .sci { background: var(--cream); }
+  .sci .gauge { display: flex; justify-content: center; gap: 24px; margin: 56px 0 40px; }
+  .sci .g { text-align: center; width: 200px; }
+  .sci .tube { position: relative; width: 70px; height: 420px; margin: 0 auto; border-radius: 35px; background: #fff; border: 4px solid var(--line); overflow: hidden; }
+  .sci .fill { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 0 0 30px 30px; }
+  .sci .g p { margin-top: 18px; font-size: 24px; color: var(--muted); line-height: 1.5; }
+  .sci .g b { display: block; font-size: 40px; color: var(--ink); white-space: nowrap; margin-top: 4px; }
+  .sci .g.hl b { color: var(--brand-dark); }
+  .sci .note { background: #fff; border-radius: 28px; padding: 36px 40px; font-size: 26px; line-height: 1.85; color: var(--muted); }
+  .sci .note strong { color: var(--ink); }
+
+  /* 04 卖点（原色、酥脆） */
+  .sp { background: #fff; }
+  .sp .num { font-size: 120px; font-weight: 900; color: #fbe6c3; line-height: 1; position: absolute; top: 56px; left: 40px; }
+  .sp .ph { height: 560px; margin: 44px 0 36px; }
+  .sp .tags { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .sp .tags span { background: var(--cream); border: 2px solid var(--line); border-radius: 999px; padding: 10px 26px; font-size: 24px; font-weight: 600; }
+  .pores { position: relative; background: linear-gradient(135deg, #ffe08a, #f2b544); overflow: hidden; }
+  .pores i { position: absolute; border-radius: 50%; background: rgba(255,255,255,.55); }
+  .pores .lbl { position: relative; z-index: 1; background: rgba(255,255,255,.85); padding: 14px 28px; border-radius: 999px; color: var(--muted); }
+
+  /* 05 工艺 */
+  .proc { background: var(--cream); }
+  .proc .list { margin-top: 48px; position: relative; }
+  .proc .list::before { content: ""; position: absolute; left: 44px; top: 40px; bottom: 40px; width: 4px; background: repeating-linear-gradient(180deg, var(--brand) 0 10px, transparent 10px 20px); }
+  .proc .it { position: relative; display: flex; align-items: center; gap: 32px; background: #fff; border-radius: 24px; padding: 28px 32px 28px 0; margin-bottom: 20px; margin-left: 0; }
+  .proc .it .n { flex: none; width: 92px; height: 92px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 38px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin-left: -2px; box-shadow: 0 0 0 10px var(--cream); }
+  .proc .it h4 { font-size: 32px; margin-bottom: 4px; }
+  .proc .it p { font-size: 23px; color: var(--muted); line-height: 1.5; }
+  .proc .it.key { background: linear-gradient(90deg, #fff1d6, #fff); border: 3px solid var(--brand); }
+  .proc .it.key h4::after { content: "核心工序"; font-size: 18px; background: var(--brand-dark); color: #fff; padding: 4px 12px; border-radius: 8px; margin-left: 12px; vertical-align: middle; }
+
+  /* 06 口味 */
+  .flav { background: #fff; }
+  .flav .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+  .flav .card { border-radius: 28px; overflow: hidden; background: var(--cream); }
+  .flav .card .ph { height: 300px; border-radius: 0; }
+  .flav .card .b { padding: 24px 26px 28px; }
+  .flav .card h4 { font-size: 34px; }
+  .flav .card p { font-size: 22px; color: var(--muted); margin: 6px 0 14px; line-height: 1.5; }
+  .flav .card .spec { font-size: 22px; color: var(--brand-dark); font-weight: 700; }
+  .c1 { background: linear-gradient(135deg, #ffd66b, #f0a830); }
+  .c2 { background: linear-gradient(135deg, #fff0b3, #e9c65a); }
+  .c3 { background: linear-gradient(135deg, #cfe6a8, #7fae4f); }
+  .c4 { background: linear-gradient(135deg, #f7b38a, #b07ac9); }
+
+  /* 07 场景 */
+  .scene { background: var(--cream); }
+  .scene .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+  .scene .s { position: relative; height: 360px; border-radius: 28px; overflow: hidden; background: linear-gradient(160deg, #f4e3c6, #e3c99c); }
+  .scene .s .ph { position: absolute; inset: 0; border-radius: 0; font-size: 20px; align-items: flex-start; padding-top: 110px; }
+  .scene .s .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 24px; background: linear-gradient(0deg, rgba(43,38,32,.82), rgba(43,38,32,0)); color: #fff; }
+  .scene .s h4 { font-size: 32px; }
+  .scene .s p { font-size: 21px; opacity: .85; margin-top: 4px; }
+
+  /* 08 参数 */
+  .param { background: #fff; }
+  .param table { width: 100%; border-collapse: collapse; margin-top: 44px; font-size: 25px; border-radius: 24px; overflow: hidden; }
+  .param td { padding: 24px 28px; border-bottom: 2px solid var(--line); line-height: 1.5; }
+  .param td:first-child { width: 220px; background: var(--cream); color: var(--muted); font-weight: 600; }
+  .param tr:last-child td { border-bottom: none; }
+  .param .tip { margin-top: 24px; font-size: 20px; color: var(--muted); text-align: center; }
+
+  /* 09 问答 */
+  .qa { background: var(--cream); }
+  .qa .q { background: #fff; border-radius: 24px; padding: 32px 36px; margin-top: 24px; }
+  .qa .q h4 { font-size: 30px; display: flex; gap: 16px; align-items: flex-start; }
+  .qa .q h4 span, .qa .q p span { flex: none; width: 48px; height: 48px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; }
+  .qa .q h4 span { background: var(--ink); }
+  .qa .q p { display: flex; gap: 16px; margin-top: 18px; font-size: 24px; line-height: 1.75; color: var(--muted); }
+  .qa .q p span { background: var(--brand); margin-top: 2px; }
+
+  /* 10 收尾 */
+  .end { background: var(--ink); color: #f5ede1; text-align: center; padding: 96px 48px 88px; }
+  .end .h { color: #fff; }
+  .end .sub { color: #c8bba8; }
+  .end .promise { display: flex; justify-content: space-between; margin: 56px 0 48px; }
+  .end .promise div { width: 200px; border: 2px solid #4d443a; border-radius: 24px; padding: 28px 0; font-size: 26px; font-weight: 700; }
+  .end .promise small { display: block; font-size: 19px; color: #a99c8a; font-weight: 400; margin-top: 6px; }
+  .end .foot { font-size: 20px; color: #8f8373; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<!-- 01 首屏海报 -->
+<section class="m hero" id="s01">
+  <div class="brand">【品牌名】</div>
+  <div class="badge">VF 真空低温工艺</div>
+  <div class="title">
+    <div class="t1">低温慢锁<br><em>脆出原本的鲜</em></div>
+    <div class="t2">真空低温 · 原色原味 · 酥脆不腻</div>
+  </div>
+  <div class="plate"><div class="ph">产品主图 / 实拍图</div></div>
+  <div class="temp"><b>≈90℃</b><span>真空低温脱水</span></div>
+  <div class="icons">
+    <div>原色原味<small>不焦不暗</small></div>
+    <div>酥松香脆<small>一咬咔嚓</small></div>
+    <div>充氮锁鲜<small>开袋即脆</small></div>
+  </div>
+</section>
+
+<!-- 02 对比 -->
+<section class="m vs" id="s02">
+  <div class="en">WHY VF</div>
+  <div class="h">同样是果蔬脆<br><em>油温低了近一半</em></div>
+  <div class="bar"></div>
+  <div class="row">
+    <div class="col bad">
+      <h3>常规高温油炸</h3>
+      <div class="deg">160–190℃</div>
+      <div class="ph">对比图（可选）</div>
+      <ul><li>颜色易发暗</li><li>焦香盖本味</li><li>口感偏硬偏油</li></ul>
+    </div>
+    <div class="col good">
+      <h3>VF 真空低温</h3>
+      <div class="deg">≈90℃</div>
+      <div class="ph">本品实拍</div>
+      <ul><li>接近原料本色</li><li>保留果蔬本味</li><li>酥松清爽</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 03 原理 -->
+<section class="m sci" id="s03">
+  <div class="en">THE SCIENCE</div>
+  <div class="h">抽掉空气<br><em>水在 60℃ 以下就沸腾</em></div>
+  <div class="bar"></div>
+  <div class="gauge">
+    <div class="g">
+      <div class="tube"><div class="fill" style="height:100%;background:linear-gradient(0deg,#d9cbbb,#bfa68a);"></div></div>
+      <p>常规油炸油温<b>160–190℃</b></p>
+    </div>
+    <div class="g hl">
+      <div class="tube"><div class="fill" style="height:50%;background:linear-gradient(0deg,#f0a830,#ffd66b);"></div></div>
+      <p>VF 油温<b>≈90℃</b></p>
+    </div>
+    <div class="g hl">
+      <div class="tube"><div class="fill" style="height:28%;background:linear-gradient(0deg,#7fae4f,#cfe6a8);"></div></div>
+      <p>真空下水的沸点<b>40–60℃</b></p>
+    </div>
+  </div>
+  <div class="note">
+    就像<strong>山顶上烧水不到 100℃ 就开</strong>：气压降低，沸点也随之降低。<br>
+    我们把果蔬放进真空罐，在约 -0.09 MPa 的真空度下，只需约 90℃ 的油温，就能让水分快速蒸发，<strong>果蔬不会被高温“炸焦”</strong>。
+  </div>
+</section>
+
+<!-- 04 卖点：原色原味 -->
+<section class="m sp" id="s04">
+  <div class="num">01</div>
+  <div class="en">TRUE COLOR</div>
+  <div class="h">原色原味<br><em>看得见的新鲜</em></div>
+  <div class="sub">菠萝蜜还是金黄色，秋葵还是翠绿色<br>一口咬下去，就是果蔬本来的味道</div>
+  <div class="ph c1">实拍特写：切面 / 颜色对比</div>
+  <div class="tags"><span>不焦</span><span>不暗</span><span>果香足</span></div>
+</section>
+
+<!-- 05 卖点：酥脆 -->
+<section class="m sp" id="s05" style="background:var(--cream);">
+  <div class="num" style="color:#f6dcb0;">02</div>
+  <div class="en">CRISPY</div>
+  <div class="h">细密多孔<br><em>一咬“咔嚓”</em></div>
+  <div class="sub">水分在低温下迅速汽化，在果肉里留下细密小孔<br>出锅前真空离心脱油，酥脆而不腻口</div>
+  <div class="ph pores" id="pores"><span class="lbl">实拍特写：掰开的断面</span></div>
+  <div class="tags"><span>酥松</span><span>清爽</span><span>不油腻</span></div>
+</section>
+
+<!-- 06 工艺 -->
+<section class="m proc" id="s06">
+  <div class="en">PROCESS</div>
+  <div class="h">六道工序<br><em>从鲜果到脆片</em></div>
+  <div class="bar"></div>
+  <div class="list">
+    <div class="it"><div class="n">1</div><div><h4>严选鲜果</h4><p>【产地】当季鲜果蔬，逐批挑拣</p></div></div>
+    <div class="it"><div class="n">2</div><div><h4>清洗切片</h4><p>清洗去皮，切成均匀薄片</p></div></div>
+    <div class="it"><div class="n">3</div><div><h4>低温速冻</h4><p>冰晶撑开组织，成品更蓬松</p></div></div>
+    <div class="it key"><div class="n">4</div><div><h4>真空低温脱水</h4><p>约 90℃ 油浴，带走水分、留住风味</p></div></div>
+    <div class="it key"><div class="n">5</div><div><h4>真空离心脱油</h4><p>恢复常压前高速甩油，减少油脂残留</p></div></div>
+    <div class="it"><div class="n">6</div><div><h4>充氮包装</h4><p>冷却后立即充氮密封，锁住酥脆</p></div></div>
+  </div>
+</section>
+
+<!-- 07 口味 -->
+<section class="m flav" id="s07">
+  <div class="en">FLAVORS</div>
+  <div class="h">四种口味<br><em>总有一款是你的</em></div>
+  <div class="bar"></div>
+  <div class="grid">
+    <div class="card"><div class="ph c1">产品图</div><div class="b"><h4>菠萝蜜脆</h4><p>金黄果肉，热带果香浓郁</p><div class="spec">【xx g / 袋】</div></div></div>
+    <div class="card"><div class="ph c2">产品图</div><div class="b"><h4>香蕉脆</h4><p>片片完整，奶香淡淡</p><div class="spec">【xx g / 袋】</div></div></div>
+    <div class="card"><div class="ph c3">产品图</div><div class="b"><h4>秋葵脆</h4><p>翠绿颜色，咸香酥脆</p><div class="spec">【xx g / 袋】</div></div></div>
+    <div class="card"><div class="ph c4">产品图</div><div class="b"><h4>什锦果蔬脆</h4><p>一袋多种，颜色缤纷</p><div class="spec">【xx g / 袋】</div></div></div>
+  </div>
+</section>
+
+<!-- 08 场景 -->
+<section class="m scene" id="s08">
+  <div class="en">ANYTIME</div>
+  <div class="h">什么时候<br><em>都刚刚好</em></div>
+  <div class="bar"></div>
+  <div class="grid">
+    <div class="s"><div class="ph">场景图</div><div class="cap"><h4>办公室加餐</h4><p>下午三点解解馋，不脏手</p></div></div>
+    <div class="s"><div class="ph">场景图</div><div class="cap"><h4>追剧零食</h4><p>比薯片多一份果蔬香</p></div></div>
+    <div class="s"><div class="ph">场景图</div><div class="cap"><h4>出行旅途</h4><p>独立小包装，随手放进包</p></div></div>
+    <div class="s"><div class="ph">场景图</div><div class="cap"><h4>早餐搭配</h4><p>撒进酸奶燕麦，口感更丰富</p></div></div>
+  </div>
+</section>
+
+<!-- 09 参数 -->
+<section class="m param" id="s09">
+  <div class="en">PRODUCT INFO</div>
+  <div class="h">产品信息</div>
+  <div class="bar"></div>
+  <table>
+    <tr><td>品名</td><td>【品牌名】VF 果蔬脆（【口味】）</td></tr>
+    <tr><td>配料</td><td>【以包装配料表为准】</td></tr>
+    <tr><td>净含量</td><td>【xx】g</td></tr>
+    <tr><td>工艺</td><td>真空低温油浴脱水（VF）</td></tr>
+    <tr><td>保质期</td><td>【xx】个月</td></tr>
+    <tr><td>储存方式</td><td>常温、阴凉、干燥处，避免阳光直射</td></tr>
+    <tr><td>执行标准</td><td>QB/T 2076【以实际为准】</td></tr>
+    <tr><td>生产许可证</td><td>SC【xxxxxxxxxxxxxx】</td></tr>
+    <tr><td>产地</td><td>【省 / 市】</td></tr>
+  </table>
+  <div class="tip">* 产品信息以实物包装为准</div>
+</section>
+
+<!-- 10 问答 -->
+<section class="m qa" id="s10">
+  <div class="en">Q &amp; A</div>
+  <div class="h">买前问一问</div>
+  <div class="bar"></div>
+  <div class="q"><h4><span>问</span>VF 果蔬脆是油炸的吗？</h4><p><span>答</span>是的，VF 是在真空低温下用食用油给果蔬脱水，属于低温油浴工艺，含有一定油脂。和常规高温油炸相比，油温低得多，出锅前还会真空离心脱油。</p></div>
+  <div class="q"><h4><span>问</span>吃起来甜，是加了糖吗？</h4><p><span>答</span>甜味主要来自果蔬本身的糖分。部分口味工艺中会使用【糖 / 麦芽糊精】，请以包装配料表为准。</p></div>
+  <div class="q"><h4><span>问</span>开袋后变软了怎么办？</h4><p><span>答</span>开袋后请尽快吃完或夹紧密封。如果受潮变软，烤箱 100℃ 烘 3–5 分钟即可恢复脆度。</p></div>
+  <div class="q"><h4><span>问</span>和 FD 冻干有什么区别？</h4><p><span>答</span>VF 低温油浴，口感酥脆、带淡淡油香；FD 冻干不用油，入口即化、价格更高。各有风味，按喜好选择。</p></div>
+</section>
+
+<!-- 11 收尾 -->
+<section class="m end" id="s11">
+  <div class="en" style="color:var(--brand);">OUR PROMISE</div>
+  <div class="h">尝一口<br>就知道低温的好</div>
+  <div class="promise">
+    <div>当季鲜果<small>逐批挑拣</small></div>
+    <div>批批检测<small>品质可溯</small></div>
+    <div>充氮包装<small>开袋即脆</small></div>
+  </div>
+  <div class="foot">【品牌名】 · 【公司全称】<br>客服电话：【xxx-xxxx-xxxx】</div>
+</section>
+
+<script>
+  // 生成“多孔断面”示意圆点（固定种子，保证每次导出一致）
+  (function () {
+    var box = document.getElementById('pores'), seed = 7;
+    function r() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < 70; i++) {
+      var d = 10 + r() * 46, el = document.createElement('i');
+      el.style.width = el.style.height = d + 'px';
+      el.style.left = (r() * 100) + '%';
+      el.style.top = (r() * 100) + '%';
+      el.style.opacity = (0.35 + r() * 0.6).toFixed(2);
+      box.appendChild(el);
+    }
+  })();
+</script>
+</body>
+</html>
