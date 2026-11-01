@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【品牌名】VF 真空低温果蔬脆 · 低温慢锁，脆出原本的鲜</title>
+<meta name="description" content="【品牌名】VF 真空低温工艺果蔬脆，约 90℃ 低温脱水，保留果蔬原色原味，酥脆不腻，充氮锁鲜。">
+<style>
+  :root {
+    --brand: #e8a33d;
+    --brand-dark: #b8761a;
+    --green: #5f8f3e;
+    --ink: #2b2620;
+    --muted: #6f665c;
+    --bg: #fffaf2;
+    --card: #ffffff;
+    --line: #efe4d3;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.75;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; }
+  h2 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.3; margin-bottom: 12px; text-align: center; }
+  .lead { color: var(--muted); text-align: center; max-width: 640px; margin: 0 auto 48px; }
+  .eyebrow { display: block; text-align: center; color: var(--brand-dark); font-weight: 600; letter-spacing: .12em; font-size: 13px; margin-bottom: 8px; }
+
+  /* 导航 */
+  nav { position: sticky; top: 0; z-index: 10; background: rgba(255,250,242,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { font-weight: 700; font-size: 20px; }
+  .logo span { color: var(--brand-dark); }
+  nav ul { display: flex; gap: 28px; list-style: none; font-size: 15px; color: var(--muted); }
+  nav ul a:hover { color: var(--ink); }
+
+  /* 按钮 */
+  .btn { display: inline-block; padding: 14px 32px; border-radius: 999px; font-weight: 600; font-size: 16px; transition: transform .15s, box-shadow .15s; }
+  .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 8px 20px rgba(232,163,61,.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(232,163,61,.45); }
+  .btn-ghost { border: 1.5px solid var(--ink); }
+  .btn-ghost:hover { background: var(--ink); color: #fff; }
+
+  /* 首屏 */
+  .hero { padding: 96px 0 104px; background: radial-gradient(circle at 85% 20%, #ffe2b0 0, transparent 45%), radial-gradient(circle at 10% 90%, #e3f0d3 0, transparent 40%); }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+  .tag { display: inline-block; background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; font-size: 13px; color: var(--brand-dark); font-weight: 600; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(36px, 5.6vw, 60px); line-height: 1.18; margin-bottom: 20px; }
+  .hero h1 em { font-style: normal; color: var(--brand-dark); }
+  .hero p { font-size: 18px; color: var(--muted); margin-bottom: 36px; max-width: 520px; }
+  .hero .actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-visual { aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 200deg, #f6c560, #e8a33d, #f3d27e, #9fc46f, #f6c560); display: grid; place-items: center; box-shadow: 0 30px 60px rgba(184,118,26,.25); position: relative; }
+  .hero-visual::after { content: "产品主图"; position: absolute; inset: 14%; border-radius: 50%; background: rgba(255,255,255,.78); display: grid; place-items: center; color: var(--muted); font-size: 15px; letter-spacing: .1em; }
+  .temp { position: absolute; bottom: 6%; right: -4%; background: #fff; border-radius: 14px; padding: 12px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.08); text-align: center; z-index: 1; }
+  .temp b { display: block; font-size: 28px; color: var(--brand-dark); line-height: 1.2; }
+  .temp small { color: var(--muted); font-size: 12px; }
+
+  /* 卖点 */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .feature { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px 24px; }
+  .feature .num { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: #fff1d9; color: var(--brand-dark); font-weight: 700; margin-bottom: 18px; }
+  .feature h3 { font-size: 20px; margin-bottom: 8px; }
+  .feature p { color: var(--muted); font-size: 15px; }
+
+  /* 工艺解读 */
+  .science { background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .science .split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  .science .text p { color: var(--muted); margin-bottom: 16px; }
+  .science .text h2, .science .text .eyebrow { text-align: left; }
+  .science .text h2 { margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--bg); border-radius: var(--radius); overflow: hidden; }
+  th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+  thead th { background: var(--ink); color: #fff; font-weight: 600; }
+  thead th.hl { background: var(--brand-dark); }
+  td.hl { color: var(--brand-dark); font-weight: 600; background: #fff6e8; }
+  tbody tr:last-child td { border-bottom: none; }
+  td:first-child { color: var(--muted); }
+
+  /* 流程 */
+  .steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; counter-reset: s; }
+  .step { position: relative; text-align: center; padding: 0 4px; }
+  .step::before { counter-increment: s; content: counter(s); display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: #fff; border: 2px solid var(--brand); color: var(--brand-dark); font-weight: 700; font-size: 20px; position: relative; z-index: 1; }
+  .step:not(:last-child)::after { content: ""; position: absolute; top: 28px; left: calc(50% + 28px); width: calc(100% - 56px + 16px); height: 2px; background: repeating-linear-gradient(90deg, var(--brand) 0 6px, transparent 6px 12px); }
+  .step h4 { font-size: 17px; margin-bottom: 6px; }
+  .step p { font-size: 14px; color: var(--muted); }
+
+  /* 产品 */
+  .products { background: linear-gradient(180deg, var(--bg), #fff3df); }
+  .product { background: var(--card); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); display: flex; flex-direction: column; }
+  .product .img { aspect-ratio: 4/3; display: grid; place-items: center; color: rgba(0,0,0,.4); font-size: 14px; letter-spacing: .1em; }
+  .product .body { padding: 20px 22px 24px; flex: 1; display: flex; flex-direction: column; }
+  .product h3 { font-size: 19px; margin-bottom: 6px; }
+  .product p { color: var(--muted); font-size: 14px; flex: 1; }
+  .product .spec { margin-top: 14px; font-size: 13px; color: var(--brand-dark); font-weight: 600; }
+  .c1 { background: linear-gradient(135deg, #ffd66b, #f0a830); }
+  .c2 { background: linear-gradient(135deg, #fff0b3, #e9c65a); }
+  .c3 { background: linear-gradient(135deg, #cfe6a8, #7fae4f); }
+  .c4 { background: linear-gradient(135deg, #f7b38a, #b07ac9); }
+
+  /* 场景 */
+  .scenes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .scene { border-left: 3px solid var(--brand); padding: 4px 0 4px 18px; }
+  .scene h4 { font-size: 18px; margin-bottom: 4px; }
+  .scene p { color: var(--muted); font-size: 15px; }
+
+  /* 品质 */
+  .quality { background: var(--ink); color: #f5ede1; }
+  .quality h2 { color: #fff; }
+  .quality .lead { color: #c8bba8; }
+  .specs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #4a4239; border-radius: var(--radius); overflow: hidden; }
+  .specs div { background: #352f29; padding: 24px; }
+  .specs dt { font-size: 13px; color: #c8bba8; margin-bottom: 4px; }
+  .specs dd { font-size: 17px; font-weight: 600; color: #fff; }
+
+  /* FAQ */
+  .faq { max-width: 780px; margin: 0 auto; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; padding: 0 24px; }
+  summary { cursor: pointer; list-style: none; padding: 20px 0; font-weight: 600; font-size: 17px; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--brand-dark); font-size: 22px; line-height: 1; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { color: var(--muted); padding-bottom: 20px; font-size: 15px; }
+
+  /* CTA */
+  .cta { text-align: center; background: radial-gradient(circle at 50% 0, #ffe2b0, var(--bg) 70%); }
+  .cta p { color: var(--muted); margin: 0 auto 32px; max-width: 520px; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0; font-size: 13px; color: var(--muted); text-align: center; }
+
+  /* 响应式 */
+  @media (max-width: 960px) {
+    .grid-4, .scenes { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: repeat(3, 1fr); row-gap: 36px; }
+    .step:nth-child(3)::after { display: none; }
+    .specs { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    section { padding: 64px 0; }
+    nav ul { display: none; }
+    .hero { padding: 56px 0 72px; }
+    .hero .wrap, .science .split { grid-template-columns: 1fr; }
+    .hero-visual { max-width: 300px; margin: 0 auto; width: 100%; }
+    .grid-4, .scenes { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .step::after { display: none; }
+    .specs { grid-template-columns: 1fr; }
+    table { font-size: 13px; }
+    th, td { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo">【品牌名】<span>VF</span></a>
+    <ul>
+      <li><a href="#features">产品亮点</a></li>
+      <li><a href="#science">VF 工艺</a></li>
+      <li><a href="#products">产品系列</a></li>
+      <li><a href="#faq">常见问题</a></li>
+    </ul>
+    <a href="#buy" class="btn btn-primary" style="padding:8px 20px;font-size:14px;">立即选购</a>
+  </div>
+</nav>
+
+<!-- 1. 首屏 -->
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="tag">VF 真空低温工艺</span>
+      <h1>低温慢锁，<br><em>脆出原本的鲜</em></h1>
+      <p>【品牌名】VF 真空低温工艺果蔬脆，约 90℃ 低温脱水，留住果蔬原本的颜色和味道。</p>
+      <div class="actions">
+        <a href="#buy" class="btn btn-primary">立即选购</a>
+        <a href="#science" class="btn btn-ghost">了解 VF 工艺 ↓</a>
+      </div>
+    </div>
+    <div class="hero-visual" role="img" aria-label="产品主图占位">
+      <div class="temp"><b>≈90℃</b><small>真空低温脱水</small></div>
+    </div>
+  </div>
+</header>
+
+<!-- 2. 核心卖点 -->
+<section id="features">
+  <div class="wrap">
+    <span class="eyebrow">WHY VF</span>
+    <h2>一片果蔬脆，四个讲究</h2>
+    <p class="lead">不靠高温猛炸，靠真空和时间，把新鲜慢慢“锁”进每一片里。</p>
+    <div class="grid-4">
+      <div class="feature">
+        <div class="num">01</div>
+        <h3>原色原味</h3>
+        <p>不用高温猛炸，菠萝蜜还是金黄色，秋葵还是翠绿色。一口咬下去，就是果蔬本来的味道。</p>
+      </div>
+      <div class="feature">
+        <div class="num">02</div>
+        <h3>低温工艺</h3>
+        <p>真空环境下，水在 40–60℃ 就会沸腾。约 90℃ 的油温就能“温柔脱水”，比常规油炸低 70℃ 以上。</p>
+      </div>
+      <div class="feature">
+        <div class="num">03</div>
+        <h3>酥脆不腻</h3>
+        <p>水分低温汽化，在果肉里留下细密小孔，“咔嚓”一声脆。出锅前真空离心脱油，口感清爽。</p>
+      </div>
+      <div class="feature">
+        <div class="num">04</div>
+        <h3>充氮锁鲜</h3>
+        <p>独立充氮包装，隔绝氧气和湿气。开袋就是刚出锅的脆度。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 工艺解读 -->
+<section id="science" class="science">
+  <div class="wrap split">
+    <div class="text">
+      <span class="eyebrow">VF = VACUUM FRYING</span>
+      <h2>什么是 VF 真空低温工艺？</h2>
+      <p>山顶上烧水，不到 100℃ 就开了，因为气压低了，水的沸点也会跟着降低。</p>
+      <p>VF 工艺就是用的这个原理：把食材放进真空罐，抽掉大部分空气，水的沸点就降到 40–60℃。这时只要约 90℃ 的油温，食材里的水分就能快速蒸发。</p>
+      <p>果蔬不会被高温“炸焦”，颜色、香气和口感都能更好地保留下来。</p>
+    </div>
+    <table>
+      <thead>
+        <tr><th></th><th>常规油炸</th><th class="hl">VF 真空低温</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>加工环境</td><td>常压</td><td class="hl">真空 约 -0.09 MPa</td></tr>
+        <tr><td>油温</td><td>160–190℃</td><td class="hl">约 80–105℃</td></tr>
+        <tr><td>颜色</td><td>易褐变、发暗</td><td class="hl">接近原料本色</td></tr>
+        <tr><td>风味</td><td>焦香掩盖本味</td><td class="hl">保留果蔬本味</td></tr>
+        <tr><td>口感</td><td>硬脆、偏油</td><td class="hl">酥松、清爽</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4. 工艺流程 -->
+<section id="process">
+  <div class="wrap">
+    <span class="eyebrow">FROM FARM TO BAG</span>
+    <h2>从鲜果到脆片，六道工序</h2>
+    <p class="lead">每一步都只为一件事：少一点损耗，多留一点新鲜。</p>
+    <div class="steps">
+      <div class="step"><h4>严选鲜果</h4><p>【产地】当季鲜果蔬，逐批挑拣</p></div>
+      <div class="step"><h4>清洗切片</h4><p>清洗去皮，切成均匀薄片</p></div>
+      <div class="step"><h4>低温速冻</h4><p>冰晶撑开组织，成品更蓬松</p></div>
+      <div class="step"><h4>真空低温脱水</h4><p>约 90℃ 油浴，带走水分留住风味</p></div>
+      <div class="step"><h4>真空离心脱油</h4><p>破真空前高速甩油，减少残留</p></div>
+      <div class="step"><h4>充氮包装</h4><p>冷却后立即充氮密封</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 产品系列 -->
+<section id="products" class="products">
+  <div class="wrap">
+    <span class="eyebrow">OUR RANGE</span>
+    <h2>挑一袋，你喜欢的脆</h2>
+    <p class="lead">同一种工艺，四种风味。</p>
+    <div class="grid-4">
+      <div class="product">
+        <div class="img c1">产品图</div>
+        <div class="body"><h3>菠萝蜜脆</h3><p>金黄果肉，热带果香浓郁，越嚼越香。</p><span class="spec">【xx g / 袋】</span></div>
+      </div>
+      <div class="product">
+        <div class="img c2">产品图</div>
+        <div class="body"><h3>香蕉脆</h3><p>片片完整，奶香淡淡，老人小孩都爱吃。</p><span class="spec">【xx g / 袋】</span></div>
+      </div>
+      <div class="product">
+        <div class="img c3">产品图</div>
+        <div class="body"><h3>秋葵脆</h3><p>保留翠绿颜色，咸香酥脆，适合追剧时吃。</p><span class="spec">【xx g / 袋】</span></div>
+      </div>
+      <div class="product">
+        <div class="img c4">产品图</div>
+        <div class="body"><h3>什锦果蔬脆</h3><p>【胡萝卜、紫薯、南瓜、香菇……】一袋多种口味，颜色缤纷。</p><span class="spec">【xx g / 袋】</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 食用场景 -->
+<section id="scenes">
+  <div class="wrap">
+    <span class="eyebrow">ANYTIME</span>
+    <h2>什么时候都刚刚好</h2>
+    <p class="lead">一袋在手，随时“咔嚓”。</p>
+    <div class="scenes">
+      <div class="scene"><h4>办公室加餐</h4><p>下午三点，来一把解馋，不脏手。</p></div>
+      <div class="scene"><h4>追剧零食</h4><p>咔嚓咔嚓，比薯片多一份果蔬香。</p></div>
+      <div class="scene"><h4>出行旅途</h4><p>轻巧好带，独立小包装随手放进包里。</p></div>
+      <div class="scene"><h4>早餐搭配</h4><p>撒进酸奶、燕麦，口感更丰富。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. 品质说明 -->
+<section id="quality" class="quality">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--brand);">QUALITY</span>
+    <h2>看得见的品质</h2>
+    <p class="lead">每批次留样检测，数据以检测报告为准。</p>
+    <dl class="specs">
+      <div><dt>执行标准</dt><dd>QB/T 2076【以实际为准】</dd></div>
+      <div><dt>生产许可证</dt><dd>SC【xxxxxxxxxxxxxx】</dd></div>
+      <div><dt>保质期</dt><dd>【xx】个月</dd></div>
+      <div><dt>水分</dt><dd>≤【x】%（第三方检测）</dd></div>
+      <div><dt>脂肪含量</dt><dd>≤【x】%（第三方检测）</dd></div>
+      <div><dt>储存方式</dt><dd>常温阴凉干燥处，避免阳光直射</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- 8. FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <span class="eyebrow">FAQ</span>
+    <h2>常见问题</h2>
+    <p class="lead">关于 VF 果蔬脆，你可能想知道的。</p>
+    <div class="faq">
+      <details open>
+        <summary>VF 果蔬脆是油炸的吗？</summary>
+        <p>是的，VF 是在真空低温条件下用食用油给果蔬脱水，属于低温油浴工艺，含有一定油脂。和常规高温油炸相比，它的油温低得多，出锅前还会真空离心脱油。我们不会把它包装成“非油炸”产品。如果你想要完全不含油的果蔬干，可以看看我们的【FD 冻干系列】。</p>
+      </details>
+      <details>
+        <summary>吃起来甜，是加了糖吗？</summary>
+        <p>甜味主要来自果蔬本身的糖分，低温工艺让它更好地保留了下来。部分口味在工艺中会使用【糖 / 麦芽糊精】，具体请以包装配料表为准。</p>
+      </details>
+      <details>
+        <summary>开袋后怎么保存？</summary>
+        <p>开袋后请尽快吃完，或者用密封夹夹紧，放在干燥处。如果受潮变软，可以用烤箱 100℃ 烘 3–5 分钟，脆度就能恢复。</p>
+      </details>
+      <details>
+        <summary>VF 和 FD 冻干有什么区别？</summary>
+        <p>VF 用低温油浴脱水，口感酥脆，带一点油香。FD 在零下低温里把冰直接升华掉，不用油，口感酥松、入口即化，价格也更高。两种工艺各有风味，按自己的喜好选就好。</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CTA -->
+<section id="buy" class="cta">
+  <div class="wrap">
+    <h2>尝一口，就知道低温的好</h2>
+    <p>【新客首单优惠 / 免费试吃装】，现在下单，【xx 小时内】发货。</p>
+    <a href="#" class="btn btn-primary">立即选购</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">【品牌名】 · 【公司全称】 · 客服电话：【xxx-xxxx-xxxx】 · 地址：【xxxx】</div>
+</footer>
+
+</body>
+</html>
