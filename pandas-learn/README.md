@@ -28,6 +28,7 @@ python3 pandas-learn/main.py all      # 全部跑一遍
 | 03 | 缺失值、类型转换与新增列 | `isna`、`fillna`、`dropna`、`astype`、新增列、`.dt`、`loc[条件, 列] = 值`、`rename` / `drop` | 30 分钟 |
 | 04 | 分组聚合与排序 | `value_counts`、`groupby`、`agg`、`sort_values`、`pivot_table` | 30 分钟 |
 | 05 | 合并两张表并导出 | `merge`（left / inner）、`indicator`、`to_csv` | 30 分钟 |
+| 06 | 泰坦尼克号数据完整清洗 | 重复值、去空格、`str.extract` 提取称谓、`groupby().transform("median")` 分组填充、标记列、`category` 类型、`assert` 校验 | 45 分钟 |
 
 每个模块的用法都一样：
 
@@ -50,7 +51,7 @@ pandas-learn/
 │   └── titanic.csv      # 官方教程用的泰坦尼克号乘客数据（891 行），模块 00 用
 ├── modules/
 │   ├── common.py        # 路径和打印小工具
-│   └── m00_... m05_...  # 每个模块一个文件，入口函数都叫 run()
+│   └── m00_... m06_...  # 每个模块一个文件，入口函数都叫 run()
 └── output/              # 导出的结果（不进 git）
 ```
 
