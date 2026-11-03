@@ -57,8 +57,8 @@ pandas-learn/
 
 ## 5. 新增模块
 
-1. 在 `modules/` 里新建 `m06_xxx.py`，写一个 `run()` 函数。
-2. 在 `main.py` 的 `MODULES` 里登记一行：`"06": ("m06_xxx", "标题")`。
+1. 在 `modules/` 里新建 `m07_xxx.py`，写一个 `run()` 函数。
+2. 在 `main.py` 的 `MODULES` 里登记一行：`"07": ("m07_xxx", "标题")`。
 
 ## 版本说明
 
