@@ -5,6 +5,7 @@
     python3 pandas-learn/main.py check      # 只检查环境（不安装任何东西）
     python3 pandas-learn/main.py 01         # 运行第 1 个模块
     python3 pandas-learn/main.py all        # 依次运行全部模块
+    python3 pandas-learn/main.py inspect 文件.csv   # 体检任意 CSV（只读不改）
 """
 
 import importlib
@@ -49,6 +50,7 @@ def list_modules() -> None:
     for key, (_, title) in MODULES.items():
         print(f"  {key}  {title}")
     print("\n运行示例：python3 pandas-learn/main.py 01")
+    print("体检任意 CSV：python3 pandas-learn/main.py inspect 文件.csv")
 
 
 def run_module(key: str) -> None:
@@ -59,6 +61,10 @@ def run_module(key: str) -> None:
 
 def main(argv: list[str]) -> int:
     arg = argv[1] if len(argv) > 1 else ""
+    if arg == "inspect":
+        from inspect_csv import main as inspect_main
+
+        return inspect_main(argv[2:])
     if arg == "check":
         return 0 if check_env() else 1
     if not check_env():
