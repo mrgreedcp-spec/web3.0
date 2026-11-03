@@ -22,6 +22,7 @@ python3 pandas-learn/main.py all      # 全部跑一遍
 
 | 编号 | 主题 | 学会这些 | 建议时长 |
 |---|---|---|---|
+| 00 | 官方教程：读写泰坦尼克号 CSV | 对照[官方入门教程第 2 章](https://pandas.pydata.org/docs/getting_started/intro_tutorials/02_read_write.html)：`read_csv`、`head` / `tail`、`dtypes`、`info`、`to_excel` / `read_excel`、`to_csv` | 30 分钟 |
 | 01 | CSV、DataFrame 与 read_csv | `read_csv`、`head`、`shape`、`dtypes`、`info`、`describe`、`parse_dates`、`dtype`、`sep`、`encoding` | 30 分钟 |
 | 02 | 选列、选行与条件筛选 | `df["列"]`、`df[[...]]`、`loc` / `iloc`、`&` `\|` `~`、`isin`、`query`、`between` | 30 分钟 |
 | 03 | 缺失值、类型转换与新增列 | `isna`、`fillna`、`dropna`、`astype`、新增列、`.dt`、`loc[条件, 列] = 值`、`rename` / `drop` | 30 分钟 |
@@ -35,17 +36,21 @@ python3 pandas-learn/main.py all      # 全部跑一遍
 3. **做练习**：文件顶部的注释里有 3 道练习，直接加到 `run()` 末尾，再运行一次看结果。
 4. **换成自己的数据**：把 `data/sales.csv` 换成你自己的 CSV，或在代码里改 `read_csv` 的路径。
 
+CSV 的格式规则、`read_csv` 常用参数、常见报错和解决办法，见 [CSV_TIPS.md](CSV_TIPS.md)。
+
 ## 4. 目录
 
 ```
 pandas-learn/
 ├── main.py              # 唯一入口：环境检查 + 模块调度
+├── CSV_TIPS.md          # CSV 速查：格式规则、read_csv 参数、常见报错
 ├── data/
 │   ├── sales.csv        # 12 条订单，故意留了 1 个缺失 qty、1 个缺失 customer_id
-│   └── customers.csv    # 客户表，模块 05 合并用
+│   ├── customers.csv    # 客户表，模块 05 合并用
+│   └── titanic.csv      # 官方教程用的泰坦尼克号乘客数据（891 行），模块 00 用
 ├── modules/
 │   ├── common.py        # 路径和打印小工具
-│   └── m01_... m05_...  # 每个模块一个文件，入口函数都叫 run()
+│   └── m00_... m05_...  # 每个模块一个文件，入口函数都叫 run()
 └── output/              # 导出的结果（不进 git）
 ```
 

@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 
 # 编号 -> (模块文件名, 标题)。加新模块只需在 modules/ 里放文件并在这里登记一行。
 MODULES = {
+    "00": ("m00_titanic_read", "官方教程：读写泰坦尼克号 CSV"),
     "01": ("m01_read_csv", "CSV、DataFrame 与 read_csv"),
     "02": ("m02_select_filter", "选列、选行与条件筛选"),
     "03": ("m03_clean", "缺失值、类型转换与新增列"),
