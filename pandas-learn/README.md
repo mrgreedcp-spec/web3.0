@@ -62,7 +62,9 @@ python3 pandas-learn/main.py inspect 你的文件.csv > 报告.txt              
 | 8 类别列 | 唯一值不多的文本列，列出每个取值和出现次数 |
 | 9 问题清单 | 汇总上面所有问题，每条附处理建议 |
 
-练手用的 `data/messy_orders.csv` 里故意埋了 13 个问题，可以先拿它试试。体检只能发现**格式上**的问题，看起来合理、实际却错了的数值，还要靠业务知识判断。
+练手用的 `data/messy_orders.csv` 里故意埋了 13 个问题，可以先拿它试试。
+
+**实战项目：**[`batch-sim/`](batch-sim/README.md) 是一份模拟的生产批次数据（63 行），配有数据字典、问题清单和业务规则检查脚本。体检只能发现**格式上**的问题，看起来合理、实际却错了的数值，还要靠业务知识判断。
 
 ## 5. 目录
 
@@ -70,6 +72,7 @@ python3 pandas-learn/main.py inspect 你的文件.csv > 报告.txt              
 pandas-learn/
 ├── main.py              # 唯一入口：环境检查 + 模块调度
 ├── inspect_csv.py       # 通用 CSV 体检工具（main.py inspect 调用它）
+├── batch-sim/           # 实战：模拟生产批次数据 + 数据字典 + 问题清单
 ├── CSV_TIPS.md          # CSV 速查：格式规则、read_csv 参数、常见报错
 ├── data/
 │   ├── sales.csv        # 12 条订单，故意留了 1 个缺失 qty、1 个缺失 customer_id
