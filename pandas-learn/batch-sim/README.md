@@ -23,10 +23,13 @@ batch-sim/
 ├── ISSUES.md                 # 问题清单（含处理建议）
 ├── make_sim_data.py          # 生成模拟数据
 ├── check_issues.py           # 按业务规则检查，并和注入记录核对
+├── clean_batches.py          # 一步一步清洗（可以用 --step N 停在任意一步）
 └── data/
     ├── batches_raw_SIMULATED.csv   # 原始版本，不要手工修改
     ├── injected_issues_KEY.csv     # 注入问题的“答案”，用来核对
-    └── issues_found.csv            # 检查结果
+    ├── issues_found.csv            # 检查结果
+    ├── batches_clean_SIMULATED.csv # 清洗后的数据：60 行，带标记列和派生指标
+    └── cleaning_log.csv            # 清洗日志：每一处改动的记录
 ```
 
 ## 怎么运行
@@ -89,14 +92,27 @@ echo "de9417aec2b4880c6fa9230b12b58dbf90623b7d47c40cd395c816c0df49dcee  pandas-l
 
 核对结果：**注入 9 处，查出 9 处，没有误报。**
 
-## 下一步：清洗
+## 清洗
 
-按 [`ISSUES.md`](ISSUES.md) 里的建议写清洗脚本，可以参考 `pandas-learn/modules/m06_titanic_clean.py` 的结构：
+```bash
+python3 pandas-learn/batch-sim/clean_batches.py
+```
 
-1. 用 `raw.copy()` 复制一份，所有修改都在副本上做
-2. 删除整行重复（`drop_duplicates`）
-3. 批次号重复且数值不同的，按“确认后的结果”保留一条。练习时可以假设保留后录入的那条，**并在清洗记录里写明这是假设**
-4. 零运行时间：有产出的那条改成缺失并加标记；产出为 0 的那条标记为“已取消”
-5. 缺失值保留为空，并加标记列
-6. 用 `assert` 校验：批次号唯一、正常运行的批次 `run_hours > 0`、合格产出不超过投入
-7. 导出成 `batches_clean_SIMULATED.csv`，原始文件不动
+```bash
+python3 pandas-learn/batch-sim/clean_batches.py --step 3
+```
+
+第一条跑完全部 8 步并导出，第二条只跑到第 3 步，打印当时的数据（用来一步一步学）。
+
+| 步骤 | 做什么 | 对应问题 | 行数变化 |
+|---|---|---|---|
+| 1 | 读取，`raw.copy()` 复制一份，记下原始行号 | — | 63 |
+| 2 | 删除整行重复 | #1 #2 | 63 → 61 |
+| 3 | 批次号冲突：**按假设**保留后录入的那条，并写进日志 | #3 | 61 → 60 |
+| 4 | 零运行时间：有产出的改为缺失并标记；无产出的标记为取消 | #8 #9 | 60 |
+| 5 | 缺失值不填补，只标记 | #4–#7 | 60 |
+| 6 | 整理类型，计算合格率、产能、能耗等指标（只算数据齐全的 54 个批次，不会出现 inf） | — | 60 |
+| 7 | 用 `assert` 校验 8 项，包括原始文件没被改动 | — | 60 |
+| 8 | 导出清洗后的数据和清洗日志 | — | 60 |
+
+新增的列：`issue_flags`（这一行有什么问题）、`cancelled`（是否为取消批次）、`ok_for_efficiency`（能不能用来算效率），以及 4 个派生指标 `yield_rate`、`kg_per_hour`、`kwh_per_hour`、`kwh_per_kg`。
