@@ -16,6 +16,7 @@
 | 模拟批次 · 问题记录 | [`batch-sim/data/issues_found.csv`](batch-sim/data/issues_found.csv) | 按业务规则查出的 10 条问题记录 | 清洗计划的输入；第 7 步对账 |
 | 模拟批次 · 清洗结果 | [`batch-sim/data/batches_clean_SIMULATED.csv`](batch-sim/data/batches_clean_SIMULATED.csv) | 60 行 × 15 列，带标记和指标 | 后续分析的起点 |
 | 模拟批次 · 清洗日志 | [`batch-sim/data/cleaning_log.csv`](batch-sim/data/cleaning_log.csv) | 9 条改动记录 | 追溯每一处改动 |
+| 产线汇总指标 | [`batch-sim/data/line_comparison.csv`](batch-sim/data/line_comparison.csv) | 3 条产线的覆盖、4 个加权指标、前后变化 | 做图表或报告的数据源 |
 
 ## 工具
 
@@ -26,6 +27,7 @@
 | 模拟数据生成器 | [`batch-sim/make_sim_data.py`](batch-sim/make_sim_data.py) | 固定种子生成数据并注入问题、写答案 | 改参数生成新的练习数据 |
 | 业务规则检查 | [`batch-sim/check_issues.py`](batch-sim/check_issues.py) | R0–R8 逐条检查，并和答案核对 | 改规则用于新数据 |
 | 分步清洗脚本 | [`batch-sim/clean_batches.py`](batch-sim/clean_batches.py) | 8 步清洗，`--step N` 可停在任意一步 | 新项目照着它的结构写 |
+| 产线对比分析 | [`batch-sim/analyze_lines.py`](batch-sim/analyze_lines.py) | 加权指标、排名、指标拆解、自助法区间、稳定性 | 改分组列就能比较别的维度 |
 | 学习模块 00–06 | [`modules/`](modules/) | 读取、筛选、清洗、分组、合并、完整清洗 | `python3 pandas-learn/main.py 03` |
 
 ## 文档
@@ -36,6 +38,7 @@
 | 数据字典 | [`batch-sim/DATA_DICTIONARY.md`](batch-sim/DATA_DICTIONARY.md) | 字段、单位、范围、派生指标、业务规则 | 照着结构写新数据的字典 |
 | 问题清单 | [`batch-sim/ISSUES.md`](batch-sim/ISSUES.md) | 9 处问题、影响、建议、状态 | 照着结构写新数据的问题清单 |
 | 清洗计划 | [`batch-sim/CLEANING_PLAN.md`](batch-sim/CLEANING_PLAN.md) | 本次计划 + 空白模板 | 复制模板部分 |
+| 产线对比分析报告 | [`batch-sim/ANALYSIS.md`](batch-sim/ANALYSIS.md) | 结论、方法、局限 | 照着结构写分析报告 |
 
 ## 模板
 

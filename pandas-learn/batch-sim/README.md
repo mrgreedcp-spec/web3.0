@@ -25,12 +25,15 @@ batch-sim/
 ├── make_sim_data.py          # 生成模拟数据
 ├── check_issues.py           # 按业务规则检查，并和注入记录核对
 ├── clean_batches.py          # 一步一步清洗（可以用 --step N 停在任意一步）
+├── analyze_lines.py          # 比较三条产线
+├── ANALYSIS.md               # 三条产线对比分析报告
 └── data/
     ├── batches_raw_SIMULATED.csv   # 原始版本，不要手工修改
     ├── injected_issues_KEY.csv     # 注入问题的“答案”，用来核对
     ├── issues_found.csv            # 检查结果
     ├── batches_clean_SIMULATED.csv # 清洗后的数据：60 行，带标记列和派生指标
-    └── cleaning_log.csv            # 清洗日志：每一处改动的记录
+    ├── cleaning_log.csv            # 清洗日志：每一处改动的记录
+    └── line_comparison.csv         # 每条产线的汇总指标
 ```
 
 ## 怎么运行
@@ -119,3 +122,11 @@ python3 pandas-learn/batch-sim/clean_batches.py --step 3
 | 8 | 导出清洗后的数据和清洗日志 | — | 60 |
 
 新增的列：`issue_flags`（这一行有什么问题）、`cancelled`（是否为取消批次）、`ok_for_efficiency`（能不能用来算效率），以及 4 个派生指标 `yield_rate`、`kg_per_hour`、`kwh_per_hour`、`kwh_per_kg`。
+
+## 分析：比较三条产线
+
+```bash
+python3 pandas-learn/batch-sim/analyze_lines.py
+```
+
+报告见 [`ANALYSIS.md`](ANALYSIS.md)：L1 合格率和能效最好，L3 最快但合格率最低，L2 慢而且单位产出能耗最高。报告里还说明了加权指标、指标拆解和自助法置信区间。
