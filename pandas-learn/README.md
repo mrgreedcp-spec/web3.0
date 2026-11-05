@@ -71,6 +71,7 @@ python3 pandas-learn/main.py inspect 你的文件.csv > 报告.txt              
 ```
 pandas-learn/
 ├── main.py              # 唯一入口：环境检查 + 模块调度
+├── ASSETS.md            # 资产清单：所有数据、工具、文档、模板在哪里、怎么复用
 ├── inspect_csv.py       # 通用 CSV 体检工具（main.py inspect 调用它）
 ├── batch-sim/           # 实战：模拟生产批次数据 + 数据字典 + 问题清单 + 清洗计划
 ├── obsidian-wiki/       # 数据清洗笔记，可以直接放进 Obsidian

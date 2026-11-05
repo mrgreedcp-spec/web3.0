@@ -179,12 +179,42 @@ def step7_validate(df: pd.DataFrame) -> pd.DataFrame:
         "合格产出不超过投入": (df["good_output_kg"].dropna() <= df.loc[df["good_output_kg"].notna(), "input_kg"]).all(),
         "派生指标里没有 inf": not np.isinf(df[metrics]).any().any(),
         "有标记的行都写进了清洗日志": set(df.loc[df["issue_flags"] != "", "batch_id"]) <= {x["batch_id"] for x in log},
+        # 对账：原始行数 = 现在的行数 + 日志里记录删除的行数
+        "行数对得上账（原始 = 现在 + 已删除）": len(pd.read_csv(RAW)) == len(df) + sum("删除" in x["action"] for x in log),
+        # 问题清单里的每个问题，都按计划的方式处理了（防止某一步被跳过、问题被别的步骤“顺手”处理掉）
+        "每个问题都按计划处理": plan_matches_log(),
     }
+    # 先把所有检查都打印出来，再统一判断，这样一次能看到所有失败的项
     for name, ok in checks.items():
         print(f"  {'✓' if ok else '✗'} {name}")
-        assert ok, f"校验失败：{name}"
+    failed = [name for name, ok in checks.items() if not ok]
+    assert not failed, f"校验失败：{failed}"
     print("全部通过")
     return df
+
+
+# 问题清单里的规则 → 计划中对应的处理动作（见 CLEANING_PLAN.md 第 3 项）
+PLANNED_ACTION = {
+    "R1": ("删除整行重复",),
+    "R2": ("删除冲突记录（假设）",),
+    "R3": ("缺失，保留为空",),
+    "R4": ("run_hours 改为缺失", "标记为取消批次"),
+}
+
+
+def plan_matches_log() -> bool:
+    """问题清单（check_issues.py 的结果）和清洗日志逐条对账。"""
+    issues = pd.read_csv(HERE / "data" / "issues_found.csv")
+    expected = {(r["batch_id"], r["rule"][:2]) for _, r in issues.iterrows()}
+    done = set()
+    for x in log:
+        for rule, actions in PLANNED_ACTION.items():
+            if any(a in x["action"] for a in actions):
+                done.add((x["batch_id"], rule))
+    if expected != done:
+        print(f"    计划了但没按计划处理：{sorted(expected - done)}")
+        print(f"    处理了但不在计划里：{sorted(done - expected)}")
+    return expected == done
 
 
 # ---------------------------------------------------------------- 第 8 步
