@@ -72,7 +72,8 @@ python3 pandas-learn/main.py inspect 你的文件.csv > 报告.txt              
 pandas-learn/
 ├── main.py              # 唯一入口：环境检查 + 模块调度
 ├── inspect_csv.py       # 通用 CSV 体检工具（main.py inspect 调用它）
-├── batch-sim/           # 实战：模拟生产批次数据 + 数据字典 + 问题清单
+├── batch-sim/           # 实战：模拟生产批次数据 + 数据字典 + 问题清单 + 清洗计划
+├── obsidian-wiki/       # 数据清洗笔记，可以直接放进 Obsidian
 ├── CSV_TIPS.md          # CSV 速查：格式规则、read_csv 参数、常见报错
 ├── data/
 │   ├── sales.csv        # 12 条订单，故意留了 1 个缺失 qty、1 个缺失 customer_id

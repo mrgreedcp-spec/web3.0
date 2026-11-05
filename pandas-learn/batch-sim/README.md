@@ -21,6 +21,7 @@ batch-sim/
 ├── README.md                 # 本文件：步骤指导和验收清单
 ├── DATA_DICTIONARY.md        # 字段说明
 ├── ISSUES.md                 # 问题清单（含处理建议）
+├── CLEANING_PLAN.md          # 清洗计划（本次的计划 + 空白模板）
 ├── make_sim_data.py          # 生成模拟数据
 ├── check_issues.py           # 按业务规则检查，并和注入记录核对
 ├── clean_batches.py          # 一步一步清洗（可以用 --step N 停在任意一步）
@@ -93,6 +94,8 @@ echo "de9417aec2b4880c6fa9230b12b58dbf90623b7d47c40cd395c816c0df49dcee  pandas-l
 核对结果：**注入 9 处，查出 9 处，没有误报。**
 
 ## 清洗
+
+先写计划，再写脚本：处理决定、步骤顺序和验收标准都在 [`CLEANING_PLAN.md`](CLEANING_PLAN.md) 里，文件末尾附有空白模板。
 
 ```bash
 python3 pandas-learn/batch-sim/clean_batches.py
