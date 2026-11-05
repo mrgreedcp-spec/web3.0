@@ -6,7 +6,7 @@
 8 个步骤（对应 ISSUES.md 的问题清单）：
     1 读取，复制一份，记下每行在原始文件里的行号
     2 删除整行重复                     → 问题 #1 #2
-    3 处理“批次号重复且数值不同”       → 问题 #3（练习用的假设：保留后录入的那条）
+    3 处理“批次号重复且数值不同”       → 问题 #3（有确认结果按 CONFIRMED 表处理，否则按假设保留后录入的那条）
     4 处理零运行时间                   → 问题 #8 #9
     5 缺失值：不填补，只做标记         → 问题 #4–#7
     6 整理类型，计算派生指标（不允许出现 inf）
@@ -32,6 +32,17 @@ LOG = HERE / "data" / "cleaning_log.csv"
 RAW_SHA256 = "de9417aec2b4880c6fa9230b12b58dbf90623b7d47c40cd395c816c0df49dcee"
 
 SHOW = ["raw_line", "batch_id", "input_kg", "good_output_kg", "run_hours", "energy_kwh"]
+
+# 确认表：待确认问题有了答案，就在这里加一行，并同步写进 CLEANING_PLAN.md 第 8 项
+CONFIRMED = {
+    "SIM-20261017-L3": {
+        "ref": "C1",
+        "keep_raw_line": 54,          # 保留原始文件第 54 行
+        "column": "good_output_kg",
+        "value": 840.9,               # 这一行的值必须是 840.9，否则报错
+        "source": "练习中以生成脚本为准：make_sim_data.py 用原值减去 40 制造了第二条记录",
+    },
+}
 log: list[dict] = []  # 清洗日志
 
 
@@ -81,17 +92,28 @@ def step3_conflicting_duplicates(df: pd.DataFrame) -> pd.DataFrame:
     conflict = df[df["batch_id"].duplicated(keep=False)]
     print("同一个批次号还有多条记录：")
     print(conflict[SHOW].to_string(index=False))
-    # 真实工作中要问记录人。这里是练习，假设“后录入的是更正后的数据”，并写进日志
-    drop = df["batch_id"].duplicated(keep="last")
-    for _, r in df[drop].iterrows():
-        kept = df[(df["batch_id"] == r["batch_id"]) & ~drop].iloc[0]
-        record(3, r["batch_id"], "删除冲突记录（假设）",
-               f"原始第 {r['raw_line']} 行 good_output_kg={r['good_output_kg']}",
-               f"保留原始第 {kept['raw_line']} 行 good_output_kg={kept['good_output_kg']}",
-               "【假设】后录入的是更正后的数据；真实数据必须向记录人确认")
-    df = df[~drop].copy()
-    add_flag(df, df["batch_id"].isin(conflict["batch_id"]), "冲突记录_按假设保留")
-    print(f"按假设保留后录入的那条，剩 {len(df)} 行；批次号已唯一：{df['batch_id'].is_unique}")
+    keep = pd.Series(True, index=df.index)
+    for bid, group in conflict.groupby("batch_id"):
+        if bid in CONFIRMED:
+            # 有确认结果：按确认表保留指定的那一行
+            c = CONFIRMED[bid]
+            kept = group[group["raw_line"] == c["keep_raw_line"]]
+            # 保护：确认表里写的值必须和原始数据对得上，防止原始文件变了或行号写错
+            assert len(kept) == 1 and kept.iloc[0][c["column"]] == c["value"], f"{bid} 的确认记录和数据对不上"
+            kept, action, reason, flag = kept.iloc[0], "删除冲突记录（已确认）", f"【已确认 {c['ref']}】{c['source']}", "冲突记录_已确认"
+        else:
+            # 没有确认结果：退回到假设“后录入的是更正后的数据”
+            kept = group.iloc[-1]
+            action, reason, flag = "删除冲突记录（假设）", "【假设】后录入的是更正后的数据；真实数据必须向记录人确认", "冲突记录_按假设保留"
+        for _, r in group[group["raw_line"] != kept["raw_line"]].iterrows():
+            keep[r.name] = False
+            record(3, bid, action,
+                   f"原始第 {r['raw_line']} 行 good_output_kg={r['good_output_kg']}",
+                   f"保留原始第 {kept['raw_line']} 行 good_output_kg={kept['good_output_kg']}", reason)
+        print(f"{bid}：{action}，保留原始第 {kept['raw_line']} 行（good_output_kg={kept['good_output_kg']}）")
+        df.loc[kept.name, "issue_flags"] = (df.loc[kept.name, "issue_flags"] + ";" + flag).strip(";")
+    df = df[keep].copy()
+    print(f"剩 {len(df)} 行；批次号已唯一：{df['batch_id'].is_unique}")
     return df
 
 
@@ -196,7 +218,7 @@ def step7_validate(df: pd.DataFrame) -> pd.DataFrame:
 # 问题清单里的规则 → 计划中对应的处理动作（见 CLEANING_PLAN.md 第 3 项）
 PLANNED_ACTION = {
     "R1": ("删除整行重复",),
-    "R2": ("删除冲突记录（假设）",),
+    "R2": ("删除冲突记录",),  # “（假设）”和“（已确认）”都算按计划处理
     "R3": ("缺失，保留为空",),
     "R4": ("run_hours 改为缺失", "标记为取消批次"),
 }
